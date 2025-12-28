@@ -127,7 +127,7 @@ print(f"  Computed user audio vectors for {len(user_pref_df)} users")
 
 
 # ======================
-# 4. FIX: Map top-k IDs raw → internal
+# 4. Map top-k IDs raw → internal
 # ======================
 print("Mapping top-K IDs...")
 
