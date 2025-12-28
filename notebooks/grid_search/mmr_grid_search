@@ -1,0 +1,28 @@
+import os
+import sys
+sys.path.insert(0, "/scratch/jd5316/Capstone/Capstone/notebooks/rerankers")
+from latent_mmr import rerank_mmr_latent
+
+BASELINE = "/scratch/jd5316/Capstone/Capstone/results/lightgcn_base/lightgcn_topk.parquet"
+IDMAP = "/scratch/jd5316/Capstone/Capstone/results/lightgcn_base/id_mappings.json"
+CKPT = "/scratch/jd5316/Capstone/Capstone/checkpoints"
+
+OUT_ROOT = "/scratch/jd5316/Capstone/Capstone/results/mmr_latent/"
+os.makedirs(OUT_ROOT, exist_ok=True)
+
+lambda_values = [0.1, 0.2, 0.4, 0.6, 0.8, 0.9]
+
+for lam in lambda_values:
+    print(f"\n=== Running Latent MMR (λ={lam}) ===")
+
+    out_dir = os.path.join(OUT_ROOT, f"lambda_{lam}")
+    out_path = os.path.join(out_dir, "topk.parquet")
+
+    rerank_mmr_latent(
+        baseline_path=BASELINE,
+        checkpoint_dir=CKPT,
+        idmap_path=IDMAP,
+        output_path=out_path,
+        lambda_mmr=lam,
+        K=100
+    )

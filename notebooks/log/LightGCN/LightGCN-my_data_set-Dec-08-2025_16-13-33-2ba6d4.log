@@ -1,0 +1,404 @@
+Mon 08 Dec 2025 16:13:33 INFO  ['/scratch/jd5316/Capstone/Capstone/notebooks/train_lightgcn_baseline']
+Mon 08 Dec 2025 16:13:33 INFO  
+General Hyper Parameters:
+gpu_id = 0
+use_gpu = True
+seed = 2020
+state = INFO
+reproducibility = True
+data_path = /scratch/jd5316/Capstone/Capstone/Data/recbole_data/my_data_set
+checkpoint_dir = /scratch/jd5316/Capstone/Capstone/checkpoints/
+show_progress = True
+save_dataset = False
+dataset_save_path = None
+save_dataloaders = False
+dataloaders_save_path = None
+log_wandb = False
+
+Training Hyper Parameters:
+epochs = 30
+train_batch_size = 2048
+learner = adam
+learning_rate = 0.001
+train_neg_sample_args = {'distribution': 'uniform', 'sample_num': 1, 'alpha': 1.0, 'dynamic': False, 'candidate_num': 0}
+eval_step = 1
+stopping_step = 10
+clip_grad_norm = None
+weight_decay = 0.0
+loss_decimal_place = 4
+
+Evaluation Hyper Parameters:
+eval_args = {'split': {'RS': [0.8, 0.1, 0.1]}, 'order': 'RO', 'group_by': 'user', 'mode': {'valid': 'full', 'test': 'full'}}
+repeatable = False
+metrics = ['Recall', 'MRR', 'NDCG', 'Hit', 'Precision']
+topk = [10]
+valid_metric = MRR@10
+valid_metric_bigger = True
+eval_batch_size = 2048
+metric_decimal_place = 4
+
+Dataset Hyper Parameters:
+field_separator = ,
+seq_separator =  
+USER_ID_FIELD = user_id
+ITEM_ID_FIELD = item_id
+RATING_FIELD = rating
+TIME_FIELD = timestamp
+seq_len = None
+LABEL_FIELD = label
+threshold = None
+NEG_PREFIX = neg_
+load_col = {'inter': ['user_id', 'item_id']}
+unload_col = None
+unused_col = None
+additional_feat_suffix = None
+rm_dup_inter = None
+val_interval = None
+filter_inter_by_user_or_item = True
+user_inter_num_interval = [0,inf)
+item_inter_num_interval = [0,inf)
+alias_of_user_id = None
+alias_of_item_id = None
+alias_of_entity_id = None
+alias_of_relation_id = None
+preload_weight = None
+normalize_field = None
+normalize_all = None
+ITEM_LIST_LENGTH_FIELD = item_length
+LIST_SUFFIX = _list
+MAX_ITEM_LIST_LENGTH = 50
+POSITION_FIELD = position_id
+HEAD_ENTITY_ID_FIELD = head_id
+TAIL_ENTITY_ID_FIELD = tail_id
+RELATION_ID_FIELD = relation_id
+ENTITY_ID_FIELD = entity_id
+benchmark_filename = None
+
+Other Hyper Parameters: 
+worker = 0
+wandb_project = recbole
+shuffle = True
+require_pow = False
+enable_amp = False
+enable_scaler = False
+transform = None
+embedding_size = 64
+n_layers = 2
+reg_weight = 1e-05
+numerical_features = []
+discretization = None
+kg_reverse_r = False
+entity_kg_num_interval = [0,inf)
+relation_kg_num_interval = [0,inf)
+MODEL_TYPE = ModelType.GENERAL
+neg_sampling = {'uniform': 1}
+save_model = True
+save_step = 1
+valid_percent = 0.0
+test_percent = 0.0
+MODEL_INPUT_TYPE = InputType.PAIRWISE
+eval_type = EvaluatorType.RANKING
+single_spec = True
+local_rank = 0
+device = cuda
+valid_neg_sample_args = {'distribution': 'uniform', 'sample_num': 'none'}
+test_neg_sample_args = {'distribution': 'uniform', 'sample_num': 'none'}
+
+
+Mon 08 Dec 2025 16:13:36 INFO  my_data_set
+The number of users: 8001
+Average actions of users: 107.512
+The number of items: 24070
+Average actions of items: 35.73459636877311
+The number of inters: 860096
+The sparsity of the dataset: 99.5533919290417%
+Remain Fields: ['user_id', 'item_id']
+Mon 08 Dec 2025 16:13:38 INFO  [Training]: train_batch_size = [2048] train_neg_sample_args: [{'distribution': 'uniform', 'sample_num': 1, 'alpha': 1.0, 'dynamic': False, 'candidate_num': 0}]
+Mon 08 Dec 2025 16:13:38 INFO  [Evaluation]: eval_batch_size = [2048] eval_args: [{'split': {'RS': [0.8, 0.1, 0.1]}, 'order': 'RO', 'group_by': 'user', 'mode': {'valid': 'full', 'test': 'full'}}]
+Mon 08 Dec 2025 16:13:39 INFO  LightGCN(
+  (user_embedding): Embedding(8001, 64)
+  (item_embedding): Embedding(24070, 64)
+  (mf_loss): BPRLoss()
+  (reg_loss): EmbLoss()
+)
+Trainable parameters: 2052544
+Mon 08 Dec 2025 16:13:40 INFO  FLOPs: 0.0
+Mon 08 Dec 2025 16:13:55 INFO  epoch 0 training [time: 8.96s, train loss: 156.9151]
+Mon 08 Dec 2025 16:14:03 INFO  epoch 0 evaluating [time: 8.10s, valid_score: 0.061000]
+Mon 08 Dec 2025 16:14:03 INFO  valid result: 
+recall@10 : 0.0175    mrr@10 : 0.061    ndcg@10 : 0.0213    hit@10 : 0.1546    precision@10 : 0.0177
+Mon 08 Dec 2025 16:14:03 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/checkpoints/LightGCN-Dec-08-2025_16-13-40.pth
+Mon 08 Dec 2025 16:14:11 INFO  epoch 1 training [time: 8.39s, train loss: 104.3728]
+Mon 08 Dec 2025 16:14:19 INFO  epoch 1 evaluating [time: 7.88s, valid_score: 0.062600]
+Mon 08 Dec 2025 16:14:19 INFO  valid result: 
+recall@10 : 0.0182    mrr@10 : 0.0626    ndcg@10 : 0.0219    hit@10 : 0.1608    precision@10 : 0.0184
+Mon 08 Dec 2025 16:14:19 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/checkpoints/LightGCN-Dec-08-2025_16-13-40.pth
+Mon 08 Dec 2025 16:14:28 INFO  epoch 2 training [time: 8.36s, train loss: 98.0504]
+Mon 08 Dec 2025 16:14:36 INFO  epoch 2 evaluating [time: 7.86s, valid_score: 0.064800]
+Mon 08 Dec 2025 16:14:36 INFO  valid result: 
+recall@10 : 0.0189    mrr@10 : 0.0648    ndcg@10 : 0.0228    hit@10 : 0.1646    precision@10 : 0.0191
+Mon 08 Dec 2025 16:14:36 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/checkpoints/LightGCN-Dec-08-2025_16-13-40.pth
+Mon 08 Dec 2025 16:14:44 INFO  epoch 3 training [time: 8.41s, train loss: 92.8091]
+Mon 08 Dec 2025 16:14:52 INFO  epoch 3 evaluating [time: 7.92s, valid_score: 0.068900]
+Mon 08 Dec 2025 16:14:52 INFO  valid result: 
+recall@10 : 0.0202    mrr@10 : 0.0689    ndcg@10 : 0.0244    hit@10 : 0.1737    precision@10 : 0.0204
+Mon 08 Dec 2025 16:14:52 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/checkpoints/LightGCN-Dec-08-2025_16-13-40.pth
+Mon 08 Dec 2025 16:15:00 INFO  epoch 4 training [time: 8.36s, train loss: 88.7355]
+Mon 08 Dec 2025 16:15:08 INFO  epoch 4 evaluating [time: 7.92s, valid_score: 0.073600]
+Mon 08 Dec 2025 16:15:08 INFO  valid result: 
+recall@10 : 0.0224    mrr@10 : 0.0736    ndcg@10 : 0.0266    hit@10 : 0.1892    precision@10 : 0.0226
+Mon 08 Dec 2025 16:15:08 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/checkpoints/LightGCN-Dec-08-2025_16-13-40.pth
+Mon 08 Dec 2025 16:15:17 INFO  epoch 5 training [time: 8.36s, train loss: 85.2022]
+Mon 08 Dec 2025 16:15:25 INFO  epoch 5 evaluating [time: 7.96s, valid_score: 0.077600]
+Mon 08 Dec 2025 16:15:25 INFO  valid result: 
+recall@10 : 0.0246    mrr@10 : 0.0776    ndcg@10 : 0.0288    hit@10 : 0.2014    precision@10 : 0.0247
+Mon 08 Dec 2025 16:15:25 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/checkpoints/LightGCN-Dec-08-2025_16-13-40.pth
+Mon 08 Dec 2025 16:15:33 INFO  epoch 6 training [time: 8.37s, train loss: 83.1318]
+Mon 08 Dec 2025 16:15:41 INFO  epoch 6 evaluating [time: 7.87s, valid_score: 0.081600]
+Mon 08 Dec 2025 16:15:41 INFO  valid result: 
+recall@10 : 0.0274    mrr@10 : 0.0816    ndcg@10 : 0.0313    hit@10 : 0.2172    precision@10 : 0.0275
+Mon 08 Dec 2025 16:15:41 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/checkpoints/LightGCN-Dec-08-2025_16-13-40.pth
+Mon 08 Dec 2025 16:15:50 INFO  epoch 7 training [time: 8.38s, train loss: 80.7905]
+Mon 08 Dec 2025 16:15:57 INFO  epoch 7 evaluating [time: 7.90s, valid_score: 0.087700]
+Mon 08 Dec 2025 16:15:57 INFO  valid result: 
+recall@10 : 0.0289    mrr@10 : 0.0877    ndcg@10 : 0.0336    hit@10 : 0.2239    precision@10 : 0.0289
+Mon 08 Dec 2025 16:15:58 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/checkpoints/LightGCN-Dec-08-2025_16-13-40.pth
+Mon 08 Dec 2025 16:16:06 INFO  epoch 8 training [time: 8.37s, train loss: 78.6188]
+Mon 08 Dec 2025 16:16:14 INFO  epoch 8 evaluating [time: 7.89s, valid_score: 0.096900]
+Mon 08 Dec 2025 16:16:14 INFO  valid result: 
+recall@10 : 0.0323    mrr@10 : 0.0969    ndcg@10 : 0.0381    hit@10 : 0.235    precision@10 : 0.0324
+Mon 08 Dec 2025 16:16:14 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/checkpoints/LightGCN-Dec-08-2025_16-13-40.pth
+Mon 08 Dec 2025 16:16:22 INFO  epoch 9 training [time: 8.35s, train loss: 76.8404]
+Mon 08 Dec 2025 16:16:30 INFO  epoch 9 evaluating [time: 7.87s, valid_score: 0.103400]
+Mon 08 Dec 2025 16:16:30 INFO  valid result: 
+recall@10 : 0.0354    mrr@10 : 0.1034    ndcg@10 : 0.0417    hit@10 : 0.2488    precision@10 : 0.0355
+Mon 08 Dec 2025 16:16:30 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/checkpoints/LightGCN-Dec-08-2025_16-13-40.pth
+Mon 08 Dec 2025 16:16:39 INFO  epoch 10 training [time: 8.35s, train loss: 74.4517]
+Mon 08 Dec 2025 16:16:47 INFO  epoch 10 evaluating [time: 7.96s, valid_score: 0.107500]
+Mon 08 Dec 2025 16:16:47 INFO  valid result: 
+recall@10 : 0.037    mrr@10 : 0.1075    ndcg@10 : 0.0438    hit@10 : 0.2529    precision@10 : 0.0372
+Mon 08 Dec 2025 16:16:47 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/checkpoints/LightGCN-Dec-08-2025_16-13-40.pth
+Mon 08 Dec 2025 16:16:55 INFO  epoch 11 training [time: 8.42s, train loss: 72.1019]
+Mon 08 Dec 2025 16:17:03 INFO  epoch 11 evaluating [time: 7.94s, valid_score: 0.111800]
+Mon 08 Dec 2025 16:17:03 INFO  valid result: 
+recall@10 : 0.0384    mrr@10 : 0.1118    ndcg@10 : 0.0456    hit@10 : 0.2578    precision@10 : 0.0387
+Mon 08 Dec 2025 16:17:03 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/checkpoints/LightGCN-Dec-08-2025_16-13-40.pth
+Mon 08 Dec 2025 16:17:11 INFO  epoch 12 training [time: 8.34s, train loss: 70.2190]
+Mon 08 Dec 2025 16:17:20 INFO  epoch 12 evaluating [time: 8.34s, valid_score: 0.113300]
+Mon 08 Dec 2025 16:17:20 INFO  valid result: 
+recall@10 : 0.04    mrr@10 : 0.1133    ndcg@10 : 0.0469    hit@10 : 0.266    precision@10 : 0.0403
+Mon 08 Dec 2025 16:17:20 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/checkpoints/LightGCN-Dec-08-2025_16-13-40.pth
+Mon 08 Dec 2025 16:17:28 INFO  epoch 13 training [time: 8.51s, train loss: 68.5527]
+Mon 08 Dec 2025 16:17:36 INFO  epoch 13 evaluating [time: 8.03s, valid_score: 0.115300]
+Mon 08 Dec 2025 16:17:36 INFO  valid result: 
+recall@10 : 0.0411    mrr@10 : 0.1153    ndcg@10 : 0.048    hit@10 : 0.2721    precision@10 : 0.0415
+Mon 08 Dec 2025 16:17:36 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/checkpoints/LightGCN-Dec-08-2025_16-13-40.pth
+Mon 08 Dec 2025 16:17:45 INFO  epoch 14 training [time: 8.45s, train loss: 66.8662]
+Mon 08 Dec 2025 16:17:53 INFO  epoch 14 evaluating [time: 7.99s, valid_score: 0.118300]
+Mon 08 Dec 2025 16:17:53 INFO  valid result: 
+recall@10 : 0.0419    mrr@10 : 0.1183    ndcg@10 : 0.0493    hit@10 : 0.2769    precision@10 : 0.0424
+Mon 08 Dec 2025 16:17:53 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/checkpoints/LightGCN-Dec-08-2025_16-13-40.pth
+Mon 08 Dec 2025 16:18:01 INFO  epoch 15 training [time: 8.34s, train loss: 64.9950]
+Mon 08 Dec 2025 16:18:09 INFO  epoch 15 evaluating [time: 7.92s, valid_score: 0.121200]
+Mon 08 Dec 2025 16:18:09 INFO  valid result: 
+recall@10 : 0.0432    mrr@10 : 0.1212    ndcg@10 : 0.0507    hit@10 : 0.2854    precision@10 : 0.0436
+Mon 08 Dec 2025 16:18:09 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/checkpoints/LightGCN-Dec-08-2025_16-13-40.pth
+Mon 08 Dec 2025 16:18:18 INFO  epoch 16 training [time: 8.40s, train loss: 63.1105]
+Mon 08 Dec 2025 16:18:26 INFO  epoch 16 evaluating [time: 7.90s, valid_score: 0.126100]
+Mon 08 Dec 2025 16:18:26 INFO  valid result: 
+recall@10 : 0.0442    mrr@10 : 0.1261    ndcg@10 : 0.0524    hit@10 : 0.2889    precision@10 : 0.0447
+Mon 08 Dec 2025 16:18:26 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/checkpoints/LightGCN-Dec-08-2025_16-13-40.pth
+Mon 08 Dec 2025 16:18:34 INFO  epoch 17 training [time: 8.38s, train loss: 61.3522]
+Mon 08 Dec 2025 16:18:42 INFO  epoch 17 evaluating [time: 7.86s, valid_score: 0.128200]
+Mon 08 Dec 2025 16:18:42 INFO  valid result: 
+recall@10 : 0.0453    mrr@10 : 0.1282    ndcg@10 : 0.0534    hit@10 : 0.2944    precision@10 : 0.0457
+Mon 08 Dec 2025 16:18:42 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/checkpoints/LightGCN-Dec-08-2025_16-13-40.pth
+Mon 08 Dec 2025 16:18:50 INFO  epoch 18 training [time: 8.34s, train loss: 59.5212]
+Mon 08 Dec 2025 16:18:58 INFO  epoch 18 evaluating [time: 7.86s, valid_score: 0.130400]
+Mon 08 Dec 2025 16:18:58 INFO  valid result: 
+recall@10 : 0.0464    mrr@10 : 0.1304    ndcg@10 : 0.0547    hit@10 : 0.3012    precision@10 : 0.0469
+Mon 08 Dec 2025 16:18:58 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/checkpoints/LightGCN-Dec-08-2025_16-13-40.pth
+Mon 08 Dec 2025 16:19:07 INFO  epoch 19 training [time: 8.36s, train loss: 58.0897]
+Mon 08 Dec 2025 16:19:15 INFO  epoch 19 evaluating [time: 7.89s, valid_score: 0.133600]
+Mon 08 Dec 2025 16:19:15 INFO  valid result: 
+recall@10 : 0.0479    mrr@10 : 0.1336    ndcg@10 : 0.0563    hit@10 : 0.3078    precision@10 : 0.0484
+Mon 08 Dec 2025 16:19:15 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/checkpoints/LightGCN-Dec-08-2025_16-13-40.pth
+Mon 08 Dec 2025 16:19:23 INFO  epoch 20 training [time: 8.35s, train loss: 56.4192]
+Mon 08 Dec 2025 16:19:31 INFO  epoch 20 evaluating [time: 8.05s, valid_score: 0.135500]
+Mon 08 Dec 2025 16:19:31 INFO  valid result: 
+recall@10 : 0.0489    mrr@10 : 0.1355    ndcg@10 : 0.0572    hit@10 : 0.3132    precision@10 : 0.0492
+Mon 08 Dec 2025 16:19:31 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/checkpoints/LightGCN-Dec-08-2025_16-13-40.pth
+Mon 08 Dec 2025 16:19:39 INFO  epoch 21 training [time: 8.38s, train loss: 55.2361]
+Mon 08 Dec 2025 16:19:48 INFO  epoch 21 evaluating [time: 8.05s, valid_score: 0.137700]
+Mon 08 Dec 2025 16:19:48 INFO  valid result: 
+recall@10 : 0.0498    mrr@10 : 0.1377    ndcg@10 : 0.0583    hit@10 : 0.3156    precision@10 : 0.05
+Mon 08 Dec 2025 16:19:48 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/checkpoints/LightGCN-Dec-08-2025_16-13-40.pth
+Mon 08 Dec 2025 16:19:56 INFO  epoch 22 training [time: 8.36s, train loss: 54.0105]
+Mon 08 Dec 2025 16:20:04 INFO  epoch 22 evaluating [time: 8.05s, valid_score: 0.139200]
+Mon 08 Dec 2025 16:20:04 INFO  valid result: 
+recall@10 : 0.0508    mrr@10 : 0.1392    ndcg@10 : 0.0592    hit@10 : 0.3219    precision@10 : 0.0509
+Mon 08 Dec 2025 16:20:04 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/checkpoints/LightGCN-Dec-08-2025_16-13-40.pth
+Mon 08 Dec 2025 16:20:12 INFO  epoch 23 training [time: 8.36s, train loss: 52.7858]
+Mon 08 Dec 2025 16:20:21 INFO  epoch 23 evaluating [time: 8.07s, valid_score: 0.142300]
+Mon 08 Dec 2025 16:20:21 INFO  valid result: 
+recall@10 : 0.0518    mrr@10 : 0.1423    ndcg@10 : 0.0603    hit@10 : 0.3279    precision@10 : 0.0518
+Mon 08 Dec 2025 16:20:21 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/checkpoints/LightGCN-Dec-08-2025_16-13-40.pth
+Mon 08 Dec 2025 16:20:29 INFO  epoch 24 training [time: 8.36s, train loss: 51.6080]
+Mon 08 Dec 2025 16:20:37 INFO  epoch 24 evaluating [time: 8.07s, valid_score: 0.144300]
+Mon 08 Dec 2025 16:20:37 INFO  valid result: 
+recall@10 : 0.0522    mrr@10 : 0.1443    ndcg@10 : 0.061    hit@10 : 0.329    precision@10 : 0.0522
+Mon 08 Dec 2025 16:20:37 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/checkpoints/LightGCN-Dec-08-2025_16-13-40.pth
+Mon 08 Dec 2025 16:20:46 INFO  epoch 25 training [time: 8.38s, train loss: 50.4724]
+Mon 08 Dec 2025 16:20:54 INFO  epoch 25 evaluating [time: 8.09s, valid_score: 0.145400]
+Mon 08 Dec 2025 16:20:54 INFO  valid result: 
+recall@10 : 0.0526    mrr@10 : 0.1454    ndcg@10 : 0.0616    hit@10 : 0.333    precision@10 : 0.0527
+Mon 08 Dec 2025 16:20:54 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/checkpoints/LightGCN-Dec-08-2025_16-13-40.pth
+Mon 08 Dec 2025 16:21:02 INFO  epoch 26 training [time: 8.34s, train loss: 49.6645]
+Mon 08 Dec 2025 16:21:10 INFO  epoch 26 evaluating [time: 8.11s, valid_score: 0.146600]
+Mon 08 Dec 2025 16:21:10 INFO  valid result: 
+recall@10 : 0.0535    mrr@10 : 0.1466    ndcg@10 : 0.0623    hit@10 : 0.3384    precision@10 : 0.0535
+Mon 08 Dec 2025 16:21:10 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/checkpoints/LightGCN-Dec-08-2025_16-13-40.pth
+Mon 08 Dec 2025 16:21:19 INFO  epoch 27 training [time: 8.38s, train loss: 48.3962]
+Mon 08 Dec 2025 16:21:27 INFO  epoch 27 evaluating [time: 8.07s, valid_score: 0.147600]
+Mon 08 Dec 2025 16:21:27 INFO  valid result: 
+recall@10 : 0.0535    mrr@10 : 0.1476    ndcg@10 : 0.0626    hit@10 : 0.3376    precision@10 : 0.0536
+Mon 08 Dec 2025 16:21:27 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/checkpoints/LightGCN-Dec-08-2025_16-13-40.pth
+Mon 08 Dec 2025 16:21:35 INFO  epoch 28 training [time: 8.41s, train loss: 47.9843]
+Mon 08 Dec 2025 16:21:43 INFO  epoch 28 evaluating [time: 8.13s, valid_score: 0.149900]
+Mon 08 Dec 2025 16:21:43 INFO  valid result: 
+recall@10 : 0.0549    mrr@10 : 0.1499    ndcg@10 : 0.0639    hit@10 : 0.3449    precision@10 : 0.0549
+Mon 08 Dec 2025 16:21:43 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/checkpoints/LightGCN-Dec-08-2025_16-13-40.pth
+Mon 08 Dec 2025 16:21:52 INFO  epoch 29 training [time: 8.36s, train loss: 46.8561]
+Mon 08 Dec 2025 16:22:00 INFO  epoch 29 evaluating [time: 8.19s, valid_score: 0.151900]
+Mon 08 Dec 2025 16:22:00 INFO  valid result: 
+recall@10 : 0.0553    mrr@10 : 0.1519    ndcg@10 : 0.0645    hit@10 : 0.3479    precision@10 : 0.0553
+Mon 08 Dec 2025 16:22:00 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/checkpoints/LightGCN-Dec-08-2025_16-13-40.pth
+Mon 08 Dec 2025 16:22:00 INFO  Loading model structure and parameters from /scratch/jd5316/Capstone/Capstone/checkpoints/LightGCN-Dec-08-2025_16-13-40.pth
+Mon 08 Dec 2025 16:22:09 INFO  The running environment of this training is as follows:
++-------------+-----------------+
+| Environment |      Usage      |
++=============+=================+
+| CPU         |     10.80 %     |
++-------------+-----------------+
+| GPU         | 0.23 G/44.48 G  |
++-------------+-----------------+
+| Memory      | 1.47 G/377.07 G |
++-------------+-----------------+
+Mon 08 Dec 2025 16:22:09 INFO  best valid : OrderedDict([('recall@10', 0.0553), ('mrr@10', 0.1519), ('ndcg@10', 0.0645), ('hit@10', 0.3479), ('precision@10', 0.0553)])
+Mon 08 Dec 2025 16:22:09 INFO  test result: OrderedDict([('recall@10', 0.0613), ('mrr@10', 0.1761), ('ndcg@10', 0.0752), ('hit@10', 0.3628), ('precision@10', 0.0618)])
+Mon 08 Dec 2025 16:22:10 INFO  
+General Hyper Parameters:
+gpu_id = 0
+use_gpu = True
+seed = 2020
+state = INFO
+reproducibility = True
+data_path = /scratch/jd5316/Capstone/Capstone/Data/recbole_data/my_data_set
+checkpoint_dir = /scratch/jd5316/Capstone/Capstone/checkpoints/
+show_progress = True
+save_dataset = False
+dataset_save_path = None
+save_dataloaders = False
+dataloaders_save_path = None
+log_wandb = False
+
+Training Hyper Parameters:
+epochs = 30
+train_batch_size = 2048
+learner = adam
+learning_rate = 0.001
+train_neg_sample_args = {'distribution': 'uniform', 'sample_num': 1, 'alpha': 1.0, 'dynamic': False, 'candidate_num': 0}
+eval_step = 1
+stopping_step = 10
+clip_grad_norm = None
+weight_decay = 0.0
+loss_decimal_place = 4
+
+Evaluation Hyper Parameters:
+eval_args = {'split': {'RS': [0.8, 0.1, 0.1]}, 'order': 'RO', 'group_by': 'user', 'mode': {'valid': 'full', 'test': 'full'}}
+repeatable = False
+metrics = ['Recall', 'MRR', 'NDCG', 'Hit', 'Precision']
+topk = [10]
+valid_metric = MRR@10
+valid_metric_bigger = True
+eval_batch_size = 2048
+metric_decimal_place = 4
+
+Dataset Hyper Parameters:
+field_separator = ,
+seq_separator =  
+USER_ID_FIELD = user_id
+ITEM_ID_FIELD = item_id
+RATING_FIELD = rating
+TIME_FIELD = timestamp
+seq_len = None
+LABEL_FIELD = label
+threshold = None
+NEG_PREFIX = neg_
+load_col = {'inter': ['user_id', 'item_id']}
+unload_col = None
+unused_col = None
+additional_feat_suffix = None
+rm_dup_inter = None
+val_interval = None
+filter_inter_by_user_or_item = True
+user_inter_num_interval = [0,inf)
+item_inter_num_interval = [0,inf)
+alias_of_user_id = None
+alias_of_item_id = None
+alias_of_entity_id = None
+alias_of_relation_id = None
+preload_weight = None
+normalize_field = None
+normalize_all = None
+ITEM_LIST_LENGTH_FIELD = item_length
+LIST_SUFFIX = _list
+MAX_ITEM_LIST_LENGTH = 50
+POSITION_FIELD = position_id
+HEAD_ENTITY_ID_FIELD = head_id
+TAIL_ENTITY_ID_FIELD = tail_id
+RELATION_ID_FIELD = relation_id
+ENTITY_ID_FIELD = entity_id
+benchmark_filename = None
+
+Other Hyper Parameters: 
+worker = 0
+wandb_project = recbole
+shuffle = True
+require_pow = False
+enable_amp = False
+enable_scaler = False
+transform = None
+embedding_size = 64
+n_layers = 2
+reg_weight = 1e-05
+numerical_features = []
+discretization = None
+kg_reverse_r = False
+entity_kg_num_interval = [0,inf)
+relation_kg_num_interval = [0,inf)
+MODEL_TYPE = ModelType.GENERAL
+neg_sampling = {'uniform': 1}
+save_model = True
+save_step = 1
+valid_percent = 0.0
+test_percent = 0.0
+MODEL_INPUT_TYPE = InputType.PAIRWISE
+eval_type = EvaluatorType.RANKING
+single_spec = True
+local_rank = 0
+device = cuda
+valid_neg_sample_args = {'distribution': 'uniform', 'sample_num': 'none'}
+test_neg_sample_args = {'distribution': 'uniform', 'sample_num': 'none'}
+
+
+Mon 08 Dec 2025 16:22:13 INFO  my_data_set
+The number of users: 8001
+Average actions of users: 107.512
+The number of items: 24070
+Average actions of items: 35.73459636877311
+The number of inters: 860096
+The sparsity of the dataset: 99.5533919290417%
+Remain Fields: ['user_id', 'item_id']
+Mon 08 Dec 2025 16:22:14 INFO  [Training]: train_batch_size = [2048] train_neg_sample_args: [{'distribution': 'uniform', 'sample_num': 1, 'alpha': 1.0, 'dynamic': False, 'candidate_num': 0}]
+Mon 08 Dec 2025 16:22:14 INFO  [Evaluation]: eval_batch_size = [2048] eval_args: [{'split': {'RS': [0.8, 0.1, 0.1]}, 'order': 'RO', 'group_by': 'user', 'mode': {'valid': 'full', 'test': 'full'}}]

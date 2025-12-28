@@ -1,0 +1,91 @@
+# ============================================
+# Merge Baseline Top-K with Spotify Audio Features
+# ============================================
+
+import pandas as pd
+import os
+
+# --------------------------------------------
+# 1. Define file paths
+# --------------------------------------------
+TOPK_PATH = "/scratch/jd5316/Capstone/Capstone/src/lightgcn_boost_full/lightgcn_boost_topk.parquet"
+MAPPING_PATH = "/scratch/jd5316/Capstone/Capstone/Data/processed/sample_with_id_popularity.csv"
+AUDIO_PATH = "/scratch/jd5316/Capstone/Capstone/Data/processed/reccobeats_audio_features.csv"
+
+OUTPUT_PATH = "/scratch/jd5316/Capstone/Capstone/Data/processed/enriched_topk_with_audio.parquet"
+
+
+# --------------------------------------------
+# 2. Load baseline top-K (item_id)
+# --------------------------------------------
+print("Loading LightGCN top-K parquet...")
+topk = pd.read_parquet(TOPK_PATH)
+print(f"Top-K rows: {len(topk):,}")
+
+
+# --------------------------------------------
+# 3. Load track_id → spotify_track_id mapping
+# --------------------------------------------
+mapping = pd.read_csv(MAPPING_PATH, low_memory=False)
+
+# ensure consistent types
+mapping["track_id"] = mapping["track_id"].astype(int)
+mapping["spotify_track_id"] = mapping["spotify_track_id"].astype(str)
+
+print(f"Mapping rows: {len(mapping):,}")
+
+
+# --------------------------------------------
+# 4. Merge top-K with mapping via item_id → track_id
+# --------------------------------------------
+print("Merging top-K with sample mapping...")
+topk = topk.rename(columns={"item_id": "track_id"})   # item_id == our internal track_id
+topk["track_id"] = topk["track_id"].astype(int)
+
+merged = topk.merge(
+    mapping[["track_id", "spotify_track_id"]],
+    on="track_id",
+    how="left"
+)
+
+print(f"Rows after track_id/spotify merge: {len(merged):,}")
+missing_spotify = merged['spotify_track_id'].isna().sum()
+print(f"Missing spotify_track_id: {missing_spotify:,}")
+
+
+# --------------------------------------------
+# 5. Load Spotify audio features
+# --------------------------------------------
+audio = pd.read_csv(AUDIO_PATH, low_memory=False)
+audio["spotify_track_id"] = audio["spotify_track_id"].astype(str)
+
+print(f"Audio feature rows: {len(audio):,}")
+
+
+# --------------------------------------------
+# 6. Merge audio features via spotify_track_id
+# --------------------------------------------
+print("Merging with audio features...")
+
+final = merged.merge(
+    audio,
+    on="spotify_track_id",
+    how="left"
+)
+
+missing_audio = final["danceability"].isna().sum()
+
+print(f"Final rows: {len(final):,}")
+print(f"Missing audio features: {missing_audio:,}")
+
+
+# --------------------------------------------
+# 7. Save final enriched dataset
+# --------------------------------------------
+os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
+final.to_parquet(OUTPUT_PATH, index=False)
+
+print("============================================")
+print("✅ Saved enriched dataset to:")
+print(f"{OUTPUT_PATH}")
+print("============================================")

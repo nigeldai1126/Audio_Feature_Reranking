@@ -1,0 +1,254 @@
+import os
+import json
+import pandas as pd
+import numpy as np
+import torch
+from sklearn.model_selection import train_test_split
+
+from recbole.quick_start import run_recbole
+from recbole.model.general_recommender import LightGCN
+from recbole.data import create_dataset, data_preparation
+from recbole.config import Config
+
+# -------------------------------
+# 0. Paths
+# -------------------------------
+MUSIC_PATH = "/scratch/jd5316/Capstone/Capstone/Data/sampled/sampled_music_info.csv"
+HISTORY_PATH = "/scratch/jd5316/Capstone/Capstone/Data/sampled/sampled_user_listening_history.csv"
+
+RECBOLE_DATA_PATH = "/scratch/jd5316/Capstone/Capstone/Data/recbole_data/"
+DATASET_NAME = "my_data_set"
+OUTPUT_DIR = "/scratch/jd5316/Capstone/Capstone/results/lightgcn_base/"
+CHECKPOINT_DIR = "/scratch/jd5316/Capstone/Capstone/checkpoints/"
+
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+os.makedirs(RECBOLE_DATA_PATH, exist_ok=True)
+os.makedirs(CHECKPOINT_DIR, exist_ok=True)
+dataset_dir = os.path.join(RECBOLE_DATA_PATH, DATASET_NAME)
+os.makedirs(dataset_dir, exist_ok=True)
+
+# -------------------------------
+# 1. Load & INTERACTION SPLIT
+# -------------------------------
+print("Loading data...")
+interactions = pd.read_csv(HISTORY_PATH, sep=",", low_memory=False)
+interactions = interactions.dropna(subset=["user_id", "track_id"]).drop_duplicates(["user_id", "track_id"])
+
+print(f"Sample raw IDs: users={interactions['user_id'].head().tolist()}, items={interactions['track_id'].head().tolist()}")
+
+# ✅ INTERACTION SPLIT (90/10/10)
+train_val, test = train_test_split(interactions, test_size=0.1, random_state=42)
+train, val = train_test_split(train_val, test_size=0.111, random_state=42)
+
+# Save RAW IDs for evaluation
+test[["user_id", "track_id"]].to_csv(os.path.join(OUTPUT_DIR, "test_internal.csv"), index=False)
+train[["user_id", "track_id"]].to_csv(os.path.join(OUTPUT_DIR, "train_internal.csv"), index=False)
+
+# RecBole files (RAW TOKENS)
+train[["user_id", "track_id"]].to_csv(os.path.join(dataset_dir, "train.inter"), 
+                                      index=False, header=["user_id:token", "item_id:token"])
+val[["user_id", "track_id"]].to_csv(os.path.join(dataset_dir, "val.inter"), 
+                                    index=False, header=["user_id:token", "item_id:token"])
+test[["user_id", "track_id"]].to_csv(os.path.join(dataset_dir, "test.inter"), 
+                                     index=False, header=["user_id:token", "item_id:token"])
+
+# -------------------------------
+# 2. Train LightGCN
+# -------------------------------
+parameter_dict = {
+    "model": "LightGCN",
+    "dataset": DATASET_NAME,
+    "data_path": RECBOLE_DATA_PATH,
+    "field_separator": ",",
+    "USER_ID_FIELD": "user_id",
+    "ITEM_ID_FIELD": "item_id",
+    "load_col": {"inter": ["user_id", "item_id"]},
+    "epochs": 50,
+    "embedding_size": 64,
+    "train_batch_size": 2048,
+    "eval_batch_size": 2048,
+    "learning_rate": 0.001,
+    "topk": [10, 20, 50, 100],
+    "neg_sampling": {"uniform": 1},
+    "save_dataset": False,
+    "checkpoint_dir": CHECKPOINT_DIR,
+    "save_model": True,
+    "save_step": 1,
+    "eval_step": 1,
+    "stopping_step": 5,
+    "resume": False,
+}
+
+print("Running LightGCN training...")
+run_recbole(model="LightGCN", dataset=DATASET_NAME, config_dict=parameter_dict)
+print("Training finished.")
+
+# -------------------------------
+# 3. Extract TRUE Internal→Raw Mappings (FIXED)
+# -------------------------------
+print("\n🔍 EXTRACTING CORRECT MAPPINGS...")
+
+# ✅ USE SAME DATASET AS TRAINING (matches embeddings exactly)
+config = Config(model="LightGCN", dataset=DATASET_NAME, config_dict=parameter_dict)
+dataset = create_dataset(config)
+train_data, _, _ = data_preparation(config, dataset)
+
+# ✅ CORRECT METHOD: Build mapping by matching RecBole's internal processing
+# RecBole encodes raw tokens → sequential indices → internal IDs
+# We need to reverse this: internal_id → raw_token
+
+print("Building id mappings from RecBole's processed dataset...")
+
+# Load the original train.inter file with raw tokens
+train_inter_path = os.path.join(dataset_dir, "train.inter")
+original_df = pd.read_csv(train_inter_path)
+
+# Get RecBole's internal representation of the same data
+# RecBole has already processed this and assigned internal IDs
+train_dataset = train_data.dataset
+interactions = train_dataset.inter_feat
+
+# Extract internal IDs from RecBole's processed data
+internal_user_ids = interactions[dataset.uid_field].numpy()
+internal_item_ids = interactions[dataset.iid_field].numpy()
+
+# Match them with raw IDs from original file
+raw_user_ids = original_df["user_id:token"].values
+raw_item_ids = original_df["item_id:token"].values
+
+# Build the mappings - INCLUDE ALL internal IDs (even 0 for debugging)
+internal2raw_user = {}
+internal2raw_item = {}
+
+# For each interaction, record the internal→raw mapping
+for internal_uid, raw_uid in zip(internal_user_ids, raw_user_ids):
+    # Don't skip anything - let's see what RecBole actually assigned
+    internal2raw_user[int(internal_uid)] = str(raw_uid)
+
+for internal_iid, raw_iid in zip(internal_item_ids, raw_item_ids):
+    internal2raw_item[int(internal_iid)] = str(raw_iid)
+
+print(f"\n✓ Built mappings:")
+print(f"  Users: {len(internal2raw_user)} (min ID: {min(internal2raw_user.keys())}, max: {max(internal2raw_user.keys())})")
+print(f"  Items: {len(internal2raw_item)} (min ID: {min(internal2raw_item.keys())}, max: {max(internal2raw_item.keys())})")
+
+# Remove padding (ID=0) if it exists
+if 0 in internal2raw_user:
+    padding_user = internal2raw_user.pop(0)
+    print(f"  ⚠️  Removed padding user ID 0 → '{padding_user}'")
+if 0 in internal2raw_item:
+    padding_item = internal2raw_item.pop(0)
+    print(f"  ⚠️  Removed padding item ID 0 → '{padding_item}'")
+
+# VERIFY mappings are correct
+if internal2raw_user:
+    sample_internal = list(internal2raw_user.keys())[0]
+    sample_raw = internal2raw_user[sample_internal]
+    print(f"✅ Sample user mapping: internal {sample_internal} → raw '{sample_raw}'")
+    print(f"   Raw user length: {len(sample_raw)} chars")
+
+if internal2raw_item:
+    sample_internal = list(internal2raw_item.keys())[0]
+    sample_raw = internal2raw_item[sample_internal]
+    print(f"✅ Sample item mapping: internal {sample_internal} → raw '{sample_raw}'")
+    print(f"   Raw item length: {len(sample_raw)} chars")
+
+# Verify against original CSV
+print(f"\n🔍 Verifying against original data...")
+original_interactions = pd.read_csv(HISTORY_PATH, nrows=5)
+print(f"   Original user IDs look like: {original_interactions['user_id'].iloc[0]}")
+print(f"   Original track IDs look like: {original_interactions['track_id'].iloc[0]}")
+
+# Save bidirectional mappings for compatibility with rerankers
+raw2internal_user = {str(v): k for k, v in internal2raw_user.items()}
+raw2internal_item = {str(v): k for k, v in internal2raw_item.items()}
+
+mapping_path = os.path.join(OUTPUT_DIR, "id_mappings.json")
+with open(mapping_path, "w") as f:
+    json.dump({
+        # Internal → Raw (for generating recommendations)
+        "id2user": {str(k): str(v) for k, v in internal2raw_user.items()},
+        "id2item": {str(k): str(v) for k, v in internal2raw_item.items()},
+        # Raw → Internal (for rerankers that need to look up internal IDs)
+        "user2id": raw2internal_user,
+        "item2id": raw2internal_item
+    }, f, indent=2)
+print(f"✓ SAVED {len(internal2raw_user)} users, {len(internal2raw_item)} items")
+print(f"✓ Saved bidirectional mappings: id2user, id2item, user2id, item2id")
+print(f"✓ Internal ID range: users [1-{max(internal2raw_user.keys())}], items [1-{max(internal2raw_item.keys())}]")
+
+# -------------------------------
+# 4. Generate Recommendations (FIXED)
+# -------------------------------
+device = config["device"]
+model = LightGCN(config, train_data.dataset).to(device)
+
+ckpts = [os.path.join(CHECKPOINT_DIR, f) for f in os.listdir(CHECKPOINT_DIR) if f.endswith(".pth")]
+latest_ckpt = max(ckpts, key=os.path.getctime)
+checkpoint = torch.load(latest_ckpt, map_location=device, weights_only=False)
+model.load_state_dict(checkpoint["state_dict"])
+
+# ✅ CORRECT: Keep embedding modules
+user_emb = model.user_embedding
+item_emb = model.item_embedding
+
+# ✅ Build user interactions from TRAIN data (internal IDs)
+user_interactions = {}
+train_users = train_data.dataset.inter_feat[dataset.uid_field].numpy()
+train_items = train_data.dataset.inter_feat[dataset.iid_field].numpy()
+
+for uid_int, iid_int in zip(train_users, train_items):
+    if uid_int == 0: continue  # Skip padding
+    if uid_int not in user_interactions:
+        user_interactions[uid_int] = set()
+    user_interactions[uid_int].add(iid_int)
+
+print(f"Loaded interactions for {len(user_interactions)} users")
+
+# ✅ Compute scores (FIXED gradient issue)
+TOPK = 100
+n_users_emb = user_emb.weight.shape[0]
+n_items_emb = item_emb.weight.shape[0]
+scores = torch.matmul(user_emb.weight, item_emb.weight.t()).detach().cpu().numpy()
+
+print(f"Embeddings: {n_users_emb} users x {n_items_emb} items")
+
+rows = []
+for uid_idx in range(n_users_emb):
+    # ✅ FIXED: uid_idx IS the internal ID (no offset needed)
+    if uid_idx not in internal2raw_user:
+        continue
+    
+    user_scores = scores[uid_idx].copy()
+    
+    # Mask interacted items
+    if uid_idx in user_interactions:
+        interacted_items = user_interactions[uid_idx]
+        user_scores[list(interacted_items)] = -np.inf
+    
+    # Get top-K valid items
+    top_indices = np.argsort(-user_scores)[:TOPK*2]
+    
+    rank = 1
+    for iid_idx in top_indices:
+            # Check existence
+            if iid_idx not in internal2raw_item:
+                continue
+            
+            raw_uid = internal2raw_user[uid_idx]
+            raw_iid = internal2raw_item[iid_idx]
+            
+            rows.append({
+                "user_id": str(raw_uid), 
+                "item_id": str(raw_iid),
+                "score": float(user_scores[iid_idx]),
+                "rank": rank,
+            })
+            
+            rank += 1
+            if rank > TOPK:
+                break
+
+recommendations_df = pd.DataFrame(rows)
+topk_path = os.path.join(OUTPUT_DIR, "lightgcn_topk.parquet")
+recommendations_df.to_parquet(topk_path, index=False)

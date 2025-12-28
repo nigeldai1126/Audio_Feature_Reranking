@@ -1,0 +1,39 @@
+import pandas as pd
+import numpy as np
+
+# Load listening history and compute popularity
+history = pd.read_csv("/scratch/jd5316/Capstone/Capstone/Data/new/user_listening_history.csv")
+print(f"📊 {len(history)} play events, {history['track_id'].nunique()} unique tracks")
+
+# Method 2: Normalized playcount per user (published research method)
+user_totals = history.groupby('user_id')['playcount'].sum()
+history['user_norm'] = history['playcount'] / history['user_id'].map(user_totals)
+pop_df = (history.groupby('track_id')['user_norm'].mean() * 100).reset_index()
+pop_df.columns = ['track_id', 'popularity']
+
+print(f"Popularity range: {pop_df['popularity'].min():.1f}-{pop_df['popularity'].max():.1f}")
+print(f"Zeros: {(pop_df['popularity'] == 0).sum()}/{len(pop_df)} ({(pop_df['popularity'] == 0).mean()*100:.1f}%)")
+
+# Save standalone popularity file for reranker
+pop_df.to_csv("/scratch/jd5316/Capstone/Capstone/Data/sampled/popularity.csv", index=False)
+
+# 🔹 INTEGRATE INTO sampled_music_info.csv
+print("🔹 Merging popularity into sampled_music_info...")
+music_info = pd.read_csv("/scratch/jd5316/Capstone/Capstone/Data/sampled/sampled_music_info.csv")
+
+# Merge on track_id (assuming track_id is the common key in both datasets)
+music_enriched = music_info.merge(pop_df, left_on='track_id', right_on='track_id', how='left')
+
+# Fill any missing popularity with 0
+music_enriched['popularity'] = music_enriched['popularity'].fillna(0)
+
+# Save enriched dataset
+output_path = "/scratch/jd5316/Capstone/Capstone/Data/sampled/sampled_music_info_with_popularity.csv"
+music_enriched.to_csv(output_path, index=False)
+
+print(f"✅ Saved enriched music info to: {output_path}")
+print(f"📊 Enriched shape: {music_enriched.shape}")
+print(f"🔍 {music_enriched['popularity'].isna().sum()} tracks still missing popularity")
+print(f"📈 Popularity stats in final dataset:\n{music_enriched['popularity'].describe()}")
+
+print("✅ Saved local popularity scores + integrated into music_info!")

@@ -1,0 +1,198 @@
+import os
+import json
+import numpy as np
+import pandas as pd
+from sklearn.metrics.pairwise import cosine_similarity
+
+
+# ======================
+# CONFIG
+# ======================
+MUSIC_INFO = "/scratch/jd5316/Capstone/Capstone/Data/sampled/sampled_music_info.csv"
+LISTENING = "/scratch/jd5316/Capstone/Capstone/Data/sampled/sampled_user_listening_history.csv"
+IDMAP_PATH = "/scratch/jd5316/Capstone/Capstone/results/lightgcn_base/id_mappings.json"
+BASELINE_TOPK = "/scratch/jd5316/Capstone/Capstone/results/lightgcn_base/lightgcn_topk.parquet"
+
+OUTPUT_PATH = "/scratch/jd5316/Capstone/Capstone/results/calibration/audio_prefsim_topk.csv"
+os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
+
+AUDIO_COLS = [
+    "danceability", "energy", "loudness", "speechiness",
+    "acousticness", "instrumentalness", "liveness",
+    "valence", "tempo"
+]
+
+
+# ======================
+# 1. Load data
+# ======================
+print("Loading data...")
+
+music_df = pd.read_csv(MUSIC_INFO)
+hist_df = pd.read_csv(LISTENING)
+topk_df = pd.read_parquet(BASELINE_TOPK)
+
+with open(IDMAP_PATH, "r") as f:
+    idmap = json.load(f)
+
+# raw -> internal
+user2id = {str(k): int(v) for k, v in idmap["user2id"].items()}
+item2id = {str(k): int(v) for k, v in idmap["item2id"].items()}
+
+# internal -> raw (for output)
+id2user = {int(v): k for k, v in idmap["user2id"].items()}
+id2item = {int(v): k for k, v in idmap["item2id"].items()}
+
+
+# ======================
+# 1a. Column checks
+# ======================
+for col in AUDIO_COLS + ["track_id"]:
+    if col not in music_df.columns:
+        raise ValueError(f"Missing '{col}' in music info CSV.")
+
+for col in ["track_id", "user_id", "playcount"]:
+    if col not in hist_df.columns:
+        raise ValueError(f"Missing '{col}' in listening history CSV.")
+
+for col in ["user_id", "item_id"]:
+    if col not in topk_df.columns:
+        raise ValueError(f"Missing '{col}' in top-k parquet.")
+
+
+# ======================
+# 2. Prepare item audio vectors (internal item_id)
+# ======================
+print("Preparing item audio vectors...")
+
+music_df = music_df.dropna(subset=AUDIO_COLS)
+music_df["item_id"] = music_df["track_id"].astype(str).map(item2id)
+music_df = music_df.dropna(subset=["item_id"])
+music_df["item_id"] = music_df["item_id"].astype(int)
+
+item_audio_df = music_df.set_index("item_id")[AUDIO_COLS].astype(float)
+print(f"  Loaded audio features for {len(item_audio_df)} items")
+
+
+# ======================
+# 2a. Standardize features (z-score)
+# ======================
+print("Standardizing audio features (z-score)...")
+
+mean = item_audio_df.mean(axis=0)
+std = item_audio_df.std(axis=0).replace(0, 1.0)
+item_audio_df = (item_audio_df - mean) / std
+
+
+# ======================
+# 3. Build user audio preference vectors
+# ======================
+print("Computing user preference vectors...")
+
+# Map raw -> internal item ids
+hist_df["item_id"] = hist_df["track_id"].astype(str).map(item2id)
+hist_df = hist_df.dropna(subset=["item_id"])
+hist_df["item_id"] = hist_df["item_id"].astype(int)
+
+# Merge with standardized audio features
+hist_merged = hist_df.merge(
+    item_audio_df.reset_index(),
+    on="item_id",
+    how="inner"
+)
+
+# Map raw -> internal user ids
+hist_merged["user_internal"] = hist_merged["user_id"].astype(str).map(user2id)
+hist_merged = hist_merged.dropna(subset=["user_internal"])
+hist_merged["user_internal"] = hist_merged["user_internal"].astype(int)
+
+
+def weighted_audio_pref(group):
+    weights = group["playcount"].astype(float).values
+    feats = group[AUDIO_COLS].astype(float).values
+    if weights.sum() == 0:
+        return feats.mean(axis=0)
+    return np.average(feats, axis=0, weights=weights)
+
+
+user_pref_series = hist_merged.groupby("user_internal").apply(weighted_audio_pref)
+
+user_pref_df = pd.DataFrame(
+    np.vstack(user_pref_series.values),
+    index=user_pref_series.index,
+    columns=AUDIO_COLS
+)
+
+print(f"  Computed user audio vectors for {len(user_pref_df)} users")
+
+
+# ======================
+# 4. FIX: Map top-k IDs raw → internal
+# ======================
+print("Mapping top-K IDs...")
+
+# Items
+topk_df["item_internal"] = topk_df["item_id"].astype(str).map(item2id)
+topk_df = topk_df.dropna(subset=["item_internal"])
+topk_df["item_internal"] = topk_df["item_internal"].astype(int)
+
+# Users
+topk_df["user_internal"] = topk_df["user_id"].astype(str).map(user2id)
+topk_df = topk_df.dropna(subset=["user_internal"])
+topk_df["user_internal"] = topk_df["user_internal"].astype(int)
+
+
+# ======================
+# 4b. Restrict items to those in top-K
+# ======================
+print("Restricting item audio to top-K candidates...")
+
+candidate_item_ids = sorted(topk_df["item_internal"].unique().tolist())
+item_audio_sub = item_audio_df.loc[item_audio_df.index.intersection(candidate_item_ids)]
+
+print(f"  Candidate items with audio features: {len(item_audio_sub)}")
+
+
+# ======================
+# 5. Compute AudioPrefSim
+# ======================
+print("Computing AudioPrefSim for top-K recommendations...")
+
+rows = []
+
+item_audio_dict = {
+    iid: row.values.astype(float)
+    for iid, row in item_audio_sub.iterrows()
+}
+
+for user_internal, group in topk_df.groupby("user_internal"):
+    if user_internal not in user_pref_df.index:
+        continue
+
+    u_vec = user_pref_df.loc[user_internal].values.reshape(1, -1)
+
+    for _, rec in group.iterrows():
+        item_internal = rec["item_internal"]
+        item_vec = item_audio_dict.get(item_internal)
+
+        if item_vec is None:
+            sim = 0.0
+        else:
+            sim = cosine_similarity(u_vec, item_vec.reshape(1, -1))[0, 0]
+
+        rows.append({
+            "user_id": id2user.get(user_internal),     # raw user id
+            "item_id": id2item.get(item_internal),     # raw track id
+            "audio_prefsim": float(sim)
+        })
+
+
+audio_df = pd.DataFrame(rows)
+
+
+# ======================
+# 6. Save
+# ======================
+audio_df.to_csv(OUTPUT_PATH, index=False)
+print(f"Saved AudioPrefSim to: {OUTPUT_PATH}")
+print(f"Rows: {len(audio_df)}")

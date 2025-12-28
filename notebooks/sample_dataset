@@ -1,0 +1,35 @@
+import pandas as pd
+
+history_path = "/scratch/jd5316/Capstone/Capstone/Data/new/user_listening_history.csv"
+music_path = "/scratch/jd5316/Capstone/Capstone/Data/new/music_info.csv"
+
+OUTPUT_DIR= "/scratch/jd5316/Capstone/Capstone/Data/sampled"
+
+# Load datasets
+hist = pd.read_csv(history_path)
+music = pd.read_csv(music_path)
+
+# Count interactions per user
+user_activity = hist.groupby("user_id").size().reset_index(name="count")
+
+# Select top N most active users
+N = 8000
+top_users = user_activity.sort_values("count", ascending=False).head(N)["user_id"]
+
+# Filter interactions
+sampled_history = hist[hist["user_id"].isin(top_users)]
+
+# Also compute which tracks appear
+sampled_tracks = sampled_history["track_id"].unique()
+
+# Filter metadata to keep only tracks that appear in training
+sampled_music = music[music["track_id"].isin(sampled_tracks)]
+
+# Save
+sampled_history.to_csv(OUTPUT_DIR, "sampled_user_listening_history.csv", index=False)
+sampled_music.to_csv(OUTPUT_DIR, "sampled_music_info.csv", index=False)
+
+print("Sampling complete!")
+print("Users:", sampled_history['user_id'].nunique())
+print("Tracks:", sampled_music['track_id'].nunique())
+print("Interactions:", len(sampled_history))

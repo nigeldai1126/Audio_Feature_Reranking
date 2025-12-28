@@ -1,0 +1,467 @@
+import os
+import glob
+import json
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from tqdm import tqdm
+import sys
+sys.path.insert(0, "/scratch/jd5316/Capstone/Capstone/notebooks/evaluation")
+from evaluate_metrics import evaluate_all
+
+
+# ============================================
+# 1. PATH SETUP
+# ============================================
+
+BASE_RESULTS_DIR = "/scratch/jd5316/Capstone/Capstone/results/"
+ITEM_CSV = "/scratch/jd5316/Capstone/Capstone/Data/sampled/sampled_music_info_with_popularity.csv"
+TEST_INTERNAL_CSV = "/scratch/jd5316/Capstone/Capstone/results/lightgcn_base/test_internal.csv"
+TRAIN_INTERNAL_CSV = "/scratch/jd5316/Capstone/Capstone/results/lightgcn_base/train_internal.csv" 
+ID_MAPPING_JSON = "/scratch/jd5316/Capstone/Capstone/results/lightgcn_base/id_mappings.json"
+
+OUTPUT_DIR = "/scratch/jd5316/Capstone/Capstone/results/plots"
+# ============================================
+# 2. VERIFY ALL PATHS EXIST
+# ============================================
+
+print("Verifying all required files exist...")
+required_files = [ITEM_CSV, TEST_INTERNAL_CSV, TRAIN_INTERNAL_CSV, ID_MAPPING_JSON]
+for fpath in required_files:
+    if not os.path.exists(fpath):
+        raise FileNotFoundError(f"Required file not found: {fpath}")
+print("✓ All required files found.")
+
+
+# ============================================
+# 3. LOAD ITEM METADATA CSV
+# ============================================
+
+print("\nLoading item metadata CSV...")
+item_df = pd.read_csv(ITEM_CSV)
+
+# Check for required columns
+required_cols = ["track_id", "popularity", "danceability", "energy", "valence", "tempo"]
+missing_cols = [col for col in required_cols if col not in item_df.columns]
+if missing_cols:
+    raise ValueError(f"item_df missing required columns: {missing_cols}")
+
+item_df = item_df.set_index("track_id")  # raw track IDs are the index
+print(f"✓ Loaded {len(item_df)} items with metadata.")
+
+
+# ============================================
+# 4. LOAD ID MAPPINGS
+# ============================================
+
+print("\nLoading ID mappings from id_mappings.json...")
+with open(ID_MAPPING_JSON) as f:
+    mapping = json.load(f)
+
+# Extract mappings (internal ID → raw ID)
+item_id2token = mapping["id2item"]
+user_id2token = mapping["id2user"]
+
+print(f"✓ Loaded {len(item_id2token)} item mappings and {len(user_id2token)} user mappings.")
+
+# Debug: Check mapping quality
+sample_user_internal = list(user_id2token.keys())[0]
+sample_user_raw = user_id2token[sample_user_internal]
+sample_item_internal = list(item_id2token.keys())[0]
+sample_item_raw = item_id2token[sample_item_internal]
+
+print(f"\n Mapping check:")
+print(f"   User: internal '{sample_user_internal}' → raw '{sample_user_raw[:40]}...'")
+print(f"   Item: internal '{sample_item_internal}' → raw '{sample_item_raw}'")
+
+
+# ============================================
+# 5. LOAD TEST SET (RAW IDs)
+# ============================================
+test_df = pd.read_csv(TEST_INTERNAL_CSV)
+test_df["raw_user_id"] = test_df["user_id"].astype(str)
+test_df["raw_item_id"] = test_df["track_id"].astype(str)
+
+user_test_items = test_df.groupby("raw_user_id")["raw_item_id"].apply(set).to_dict()
+print(f"\n✓ Loaded {len(user_test_items)} test users")
+print(f"   Sample test user: '{list(user_test_items.keys())[0][:40]}...'")
+print(f"   Sample test items: {len(list(user_test_items.values())[0])} items")
+
+# ============================================
+# 6. LOAD TRAINING SET (RAW IDs)
+# ============================================
+train_df = pd.read_csv(TRAIN_INTERNAL_CSV)
+train_df["raw_user_id"] = train_df["user_id"].astype(str)
+train_df["raw_item_id"] = train_df["track_id"].astype(str)
+
+user_history_items = train_df.groupby("raw_user_id")["raw_item_id"].apply(list).to_dict()
+print(f"✓ Loaded {len(user_history_items)} train users")
+
+
+# ============================================
+# 7. DEFINE LONG-TAIL THRESHOLD
+# ============================================
+
+long_tail_threshold = item_df["popularity"].quantile(0.2)   # bottom 20%
+print(f"\n✓ Long-tail threshold (20th percentile) = {long_tail_threshold:.2f}")
+
+
+# ============================================
+# 8. FIND ALL TOPK FILES
+# ============================================
+
+def collect_topk_files():
+    """Find all topk.parquet files matching the expected patterns."""
+    patterns = [
+        "mmr_latent/*/topk.parquet",
+        "my_reranker/*/topk.parquet",
+        "xquad/*/topk.parquet",
+        "lightgcn_base/lightgcn_topk.parquet"  # FIXED: removed _parquet
+    ]
+
+    files = []
+    for p in patterns:
+        full = os.path.join(BASE_RESULTS_DIR, p)
+        matched = glob.glob(full)
+        files.extend(matched)
+
+    return files
+
+
+print("\nSearching for topk.parquet files...")
+topk_files = collect_topk_files()
+
+if not topk_files:
+    raise ValueError(f"No topk.parquet files found in {BASE_RESULTS_DIR}")
+
+print(f"✓ Found {len(topk_files)} result files to evaluate:")
+for fp in topk_files:
+    print(f"  - {fp}")
+
+
+# ============================================
+# 9. PARSE MODEL NAME & PARAMS FROM PATH
+# ============================================
+
+def parse_model_and_params(path):
+    """
+    Extract model name and hyperparameter string from file path.
+    """
+    parts = path.split("/")
+    
+    # Handle lightgcn_base specially (no subdirectory)
+    if "lightgcn_base" in path:
+        return "lightgcn_base", "baseline"
+    
+    # For rerankers: .../model_name/params/topk.parquet
+    if len(parts) >= 3:
+        model = parts[-3]
+        params = parts[-2]
+        return model, params
+    
+    raise ValueError(f"Unexpected path structure: {path}")
+
+
+# ============================================
+# 10. EVALUATION LOOP (ENHANCED DEBUGGING)
+# ============================================
+
+rows = []
+K = 100  # Evaluation cutoff
+
+print(f"\n{'='*80}")
+print(f"Beginning evaluation over all hyperparameters (K={K})...")
+print(f"{'='*80}\n")
+
+for fp in tqdm(topk_files, desc="Evaluating models"):
+    try:
+        # Parse model and params from path
+        model, params = parse_model_and_params(fp)
+        print(f"\n{'='*80}")
+        print(f"Evaluating: {model}/{params}")
+        print(f"File: {fp}")
+        print(f"{'='*80}")
+
+        # Load recommendations
+        df = pd.read_parquet(fp)
+        print(f"✓ Loaded {len(df)} recommendations")
+        print(f"  Columns: {df.columns.tolist()}")
+        print(f"  Shape: {df.shape}")
+        
+        # Check data types
+        print(f"\n  Data types:")
+        print(f"    user_id: {df['user_id'].dtype}")
+        print(f"    item_id: {df['item_id'].dtype}")
+        
+        # Sample data
+        print(f"\n  Sample rows:")
+        print(df.head(3))
+        
+        print(f"\n  Unique users: {df['user_id'].nunique()}")
+        print(f"  Unique items: {df['item_id'].nunique()}")
+
+        # Convert IDs to raw format
+        print(f"\n  Converting IDs to raw format...")
+        
+        # Detect format: check if IDs are already raw (long strings) or internal (short/numeric)
+        sample_user = str(df["user_id"].iloc[0])
+        sample_item = str(df["item_id"].iloc[0])
+        
+        # Raw IDs are 40-char hashes for users, 18-char for items
+        # Internal IDs are numeric strings or small integers
+        is_raw_format = len(sample_user) > 20 or len(sample_item) > 10
+        
+        if is_raw_format:
+            print(f"    Detected RAW ID format (no mapping needed)")
+            df["raw_user_id"] = df["user_id"].astype(str)
+            df["raw_item_id"] = df["item_id"].astype(str)
+            users_mapped = len(df)
+            items_mapped = len(df)
+        else:
+            print(f"    Detected INTERNAL ID format (mapping required)")
+            df["raw_user_id"] = df["user_id"].astype(str).map(user_id2token)
+            df["raw_item_id"] = df["item_id"].astype(str).map(item_id2token)
+            users_mapped = df["raw_user_id"].notnull().sum()
+            items_mapped = df["raw_item_id"].notnull().sum()
+        
+        print(f"    Users mapped: {users_mapped}/{len(df)} ({100*users_mapped/len(df):.1f}%)")
+        print(f"    Items mapped: {items_mapped}/{len(df)} ({100*items_mapped/len(df):.1f}%)")
+        
+        # Check for unmapped IDs
+        if users_mapped < len(df):
+            unmapped_users = df[df["raw_user_id"].isnull()]["user_id"].unique()[:5]
+            print(f"Sample unmapped user IDs: {unmapped_users}")
+        
+        if items_mapped < len(df):
+            unmapped_items = df[df["raw_item_id"].isnull()]["item_id"].unique()[:5]
+            print(f"Sample unmapped item IDs: {unmapped_items}")
+
+        # Remove unmapped rows
+        df = df.dropna(subset=["raw_user_id", "raw_item_id"])
+        print(f"  After removing unmapped: {len(df)} recommendations")
+
+        # Build recommendation dict from raw IDs
+        user_recs = df.groupby("raw_user_id")["raw_item_id"].apply(list).to_dict()
+
+        # Check for empty recommendations
+        if not user_recs:
+            print(f" ERROR: No recommendations after mapping!")
+            continue
+
+        print(f"  ✓ Recommendations for {len(user_recs)} users")
+
+        # Check overlap with test set
+        test_users = set(user_test_items.keys())
+        rec_users = set(user_recs.keys())
+        overlap = test_users & rec_users
+        
+        overlap_ratio = len(overlap) / len(test_users) if test_users else 0
+        print(f"\n  Overlap analysis:")
+        print(f"    Test users: {len(test_users)}")
+        print(f"    Rec users: {len(rec_users)}")
+        print(f"    Overlap: {len(overlap)} ({overlap_ratio:.1%})")
+        
+        if overlap_ratio < 0.5:
+            print(f"  SKIPPING: Low overlap ({overlap_ratio:.1%})")
+            continue
+
+        # Sample a user to check data quality
+        sample_user = list(overlap)[0]
+        sample_recs = user_recs[sample_user][:10]
+        sample_test = list(user_test_items[sample_user])[:5]
+        
+        print(f"\n  Sample user: '{sample_user[:40]}...'")
+        print(f"    Recommended items (first 5): {sample_recs[:5]}")
+        print(f"    Test items (first 5): {sample_test}")
+        print(f"    Hits in top-10: {len(set(sample_recs[:10]) & user_test_items[sample_user])}")
+
+        # Evaluate metrics
+        print(f"\n  Computing metrics...")
+        metrics = evaluate_all(
+            user_recs=user_recs,
+            user_test_items=user_test_items,
+            user_history_items=user_history_items,
+            item_df=item_df,
+            long_tail_threshold=long_tail_threshold,
+            K=K
+        )
+
+        print(f"  ✓ Metrics computed:")
+        for key, value in metrics.items():
+            if isinstance(value, (int, float, np.number)):
+                if np.isfinite(value):
+                    print(f"    {key}: {value:.4f}")
+                else:
+                    print(f"    {key}: {value} (inf or nan)")
+            else:
+                print(f"    {key}: {value} (non-numeric)")
+
+        # Store results
+        rows.append({
+            "model": model,
+            "params": params,
+            "num_users": len(user_recs),
+            "num_test_overlap": len(overlap),
+            "overlap_ratio": overlap_ratio,
+            **metrics
+        })
+
+    except Exception as e:
+        print(f"\nERROR evaluating {fp}:")
+        print(f"   {type(e).__name__}: {e}")
+        import traceback
+        traceback.print_exc()
+        continue
+
+# ============================================
+# 11. SAVE METRICS
+# ============================================
+
+if not rows:
+    print("\nERROR: No results to save!")
+    print("All evaluations failed. Check errors above.")
+    sys.exit(1)
+
+metrics_df = pd.DataFrame(rows)
+metrics_df = metrics_df.sort_values(["model", "params"])
+
+output_csv = "frontier_metrics.csv"
+metrics_df.to_csv(output_csv, index=False)
+print(f"\n✓ Saved results to {output_csv}")
+
+# Print full results table
+print("\n" + "="*80)
+print("ALL RESULTS")
+print("="*80)
+print(metrics_df.to_string())
+
+# Print summary statistics
+print("\n" + "="*80)
+print("SUMMARY STATISTICS")
+print("="*80)
+print(metrics_df.groupby("model")[["NDCG@K", "MeanPop@K", "LongTailExposure@K", "AudioKL", "ExposureGini"]].describe())
+
+
+# ============================================
+# 12. FRONTIER PLOTS
+# ============================================
+
+def plot_frontier(df, x, y, xlabel, ylabel, filename, reverse_x=False, reverse_y=False):
+    """
+    Create scatter plot showing trade-offs between two metrics.
+    """
+    # Filter out infinite/nan values
+    df_clean = df[[x, y, "model", "params"]].copy()
+    df_clean = df_clean.replace([np.inf, -np.inf], np.nan).dropna()
+    
+    if len(df_clean) == 0:
+        print(f"  ⚠️  Skipping {filename} - no valid data after filtering inf/nan")
+        return
+    
+    plt.figure(figsize=(10, 7))
+
+    models = df_clean["model"].unique()
+    colors = plt.cm.tab10(np.linspace(0, 1, len(models)))
+    
+    for idx, model in enumerate(models):
+        sub = df_clean[df_clean["model"] == model]
+        plt.scatter(
+            sub[x], 
+            sub[y], 
+            label=f"{model} (n={len(sub)})", 
+            s=100, 
+            alpha=0.7,
+            color=colors[idx],
+            edgecolors='black',
+            linewidth=0.5
+        )
+        
+        # Add text labels for each point
+        for _, row in sub.iterrows():
+            plt.annotate(
+                row["params"],
+                (row[x], row[y]),
+                fontsize=7,
+                alpha=0.6,
+                xytext=(5, 5),
+                textcoords='offset points'
+            )
+
+    plt.xlabel(xlabel, fontsize=12)
+    plt.ylabel(ylabel, fontsize=12)
+    plt.title(f"{ylabel} vs {xlabel}", fontsize=14, fontweight='bold')
+    plt.grid(True, alpha=0.3)
+    plt.legend(loc='best', framealpha=0.9)
+    plt.tight_layout()
+    
+    if reverse_x:
+        plt.gca().invert_xaxis()
+
+    if reverse_y:
+        plt.gca().invert_yaxis()
+    
+    plt.savefig(filename, dpi=300, bbox_inches='tight')
+    plt.close()
+    print(f"  ✓ Saved {filename}")
+
+
+print("\n" + "="*80)
+print("GENERATING FRONTIER PLOTS")
+print("="*80 + "\n")
+
+# Create plots directory if it doesn't exist
+os.makedirs("plots", exist_ok=True)
+
+plot_frontier(
+    metrics_df,
+    x="LongTailExposure@K",
+    y="NDCG@K",
+    xlabel="Long-Tail Exposure (fraction)",
+    ylabel="NDCG@100",
+    filename="plots/frontier_accuracy_vs_ltexposure.png"
+)
+
+plot_frontier(
+    metrics_df,
+    x="MeanPop@K",
+    y="NDCG@K",
+    xlabel="Mean Popularity@100",
+    ylabel="NDCG@100",
+    filename="plots/frontier_accuracy_vs_meanpop.png",
+    reverse_x=True
+)
+
+plot_frontier(
+    metrics_df,
+    x="ExposureGini",
+    y="NDCG@K",
+    xlabel="Exposure Gini (inequality)",
+    ylabel="NDCG@100",
+    filename="plots/frontier_accuracy_vs_gini.png",
+    reverse_x=True
+)
+
+plot_frontier(
+    metrics_df,
+    x="AudioKL",
+    y="NDCG@K",
+    xlabel="Audio KL Divergence",
+    ylabel="NDCG@100",
+    filename="plots/frontier_accuracy_vs_audiokl.png",
+    reverse_x=True
+)
+
+plot_frontier(
+    metrics_df,
+    x="AudioKL",
+    y="LongTailExposure@K",
+    xlabel="Audio KL Divergence",
+    ylabel="Long-Tail Exposure (fraction)",
+    filename="plots/frontier_audiokl_vs_longtail.png",
+    reverse_x=True
+)
+
+print("\n✓ All frontier plots saved to plots/ directory.")
+print("\n" + "="*80)
+print("EVALUATION COMPLETE!")
+print("="*80)

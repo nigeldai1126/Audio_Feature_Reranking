@@ -1,0 +1,30 @@
+import sys
+sys.path.insert(0, "/scratch/jd5316/Capstone/Capstone/notebooks/rerankers")
+import os
+from xquad import rerank_xquad
+
+BASELINE = "/scratch/jd5316/Capstone/Capstone/results/lightgcn_base/lightgcn_topk.parquet"
+MUSIC = "/scratch/jd5316/Capstone/Capstone/Data/sampled/sampled_music_info.csv"
+HISTORY = "/scratch/jd5316/Capstone/Capstone/Data/sampled/sampled_user_listening_history.csv"
+
+OUT_ROOT = "/scratch/jd5316/Capstone/Capstone/results/xquad/"
+os.makedirs(OUT_ROOT, exist_ok=True)
+
+lambdas = [0.1, 0.25, 0.5, 0.75, 0.9] 
+
+for lam in lambdas:
+    print(f"\n=== Running xQuAD λ={lam} ===")
+    out_dir = os.path.join(OUT_ROOT, f"lambda_{lam}")
+    out_path = os.path.join(out_dir, "topk.parquet")
+    rerank_xquad(
+        baseline_path=BASELINE,
+        music_info_path=MUSIC,
+        listening_history_path=HISTORY,
+        output_path=out_path,
+        lambda_xquad=lam,
+        K=100,
+        genre_col="tags", 
+        sep_chars=None,
+        min_items_per_genre=1,
+        weight_col="playcount"
+    )

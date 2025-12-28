@@ -1,0 +1,38 @@
+import sys
+import os
+sys.path.insert(0, "/scratch/jd5316/Capstone/Capstone/notebooks/rerankers")
+from my_reranker import rerank_linear_hybrid
+# ====== Define search space ======
+alphas = [0.3, 0.5, 1.0]
+betas  = [0.4, 0.6, 0.9]
+gammas = [0.3, 0.5, 0.7]
+
+# ====== Input paths ======
+BASELINE = "/scratch/jd5316/Capstone/Capstone/results/lightgcn_base/lightgcn_topk.parquet"
+AUDIO = "/scratch/jd5316/Capstone/Capstone/results/calibration/audio_prefsim_topk.csv"
+POP = "/scratch/jd5316/Capstone/Capstone/Data/sampled/sampled_music_info_with_popularity.csv"
+
+# ====== Output root ======
+OUT_ROOT = "/scratch/jd5316/Capstone/Capstone/results/my_reranker/"
+
+os.makedirs(OUT_ROOT, exist_ok=True)
+
+# ====== Grid Search ======
+for a in alphas:
+    for b in betas:
+        for g in gammas:
+
+            out_dir = os.path.join(OUT_ROOT, f"a{a}_b{b}_g{g}")
+            out_path = os.path.join(out_dir, "topk.parquet")
+
+            print(f"=== Running α={a}, β={b}, γ={g} ===")
+            rerank_linear_hybrid(
+                baseline_path=BASELINE,
+                audio_prefsim_path=AUDIO,
+                popularity_path=POP,
+                output_path=out_path,
+                alpha=a,
+                beta=b,
+                gamma=g,
+                K=100
+            )

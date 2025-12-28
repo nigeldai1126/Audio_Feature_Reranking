@@ -1,0 +1,440 @@
+Thu 27 Nov 2025 10:48:45 INFO  ['/scratch/jd5316/Capstone/Capstone/notebooks/train_lightgcn_baseline']
+Thu 27 Nov 2025 10:48:45 INFO  
+General Hyper Parameters:
+gpu_id = 0
+use_gpu = True
+seed = 2020
+state = INFO
+reproducibility = True
+data_path = /scratch/jd5316/Capstone/Capstone/Data/recbole_data//music_sample
+checkpoint_dir = /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/
+show_progress = True
+save_dataset = False
+dataset_save_path = None
+save_dataloaders = False
+dataloaders_save_path = None
+log_wandb = False
+
+Training Hyper Parameters:
+epochs = 100
+train_batch_size = 4096
+learner = adam
+learning_rate = 0.001
+train_neg_sample_args = {'distribution': 'uniform', 'sample_num': 1, 'alpha': 1.0, 'dynamic': False, 'candidate_num': 0}
+eval_step = 1
+stopping_step = 5
+clip_grad_norm = None
+weight_decay = 0.0
+loss_decimal_place = 4
+
+Evaluation Hyper Parameters:
+eval_args = {'split': {'RS': [0.8, 0.1, 0.1]}, 'order': 'RO', 'group_by': 'user', 'mode': {'valid': 'full', 'test': 'full'}}
+repeatable = False
+metrics = ['Recall', 'MRR', 'NDCG', 'Hit', 'Precision']
+topk = [10, 20, 50, 100]
+valid_metric = MRR@10
+valid_metric_bigger = True
+eval_batch_size = 4096
+metric_decimal_place = 4
+
+Dataset Hyper Parameters:
+field_separator = ,
+seq_separator =  
+USER_ID_FIELD = user_id
+ITEM_ID_FIELD = item_id
+RATING_FIELD = rating
+TIME_FIELD = timestamp
+seq_len = None
+LABEL_FIELD = label
+threshold = None
+NEG_PREFIX = neg_
+load_col = {'inter': ['user_id', 'item_id']}
+unload_col = None
+unused_col = None
+additional_feat_suffix = None
+rm_dup_inter = None
+val_interval = None
+filter_inter_by_user_or_item = True
+user_inter_num_interval = [0,inf)
+item_inter_num_interval = [0,inf)
+alias_of_user_id = None
+alias_of_item_id = None
+alias_of_entity_id = None
+alias_of_relation_id = None
+preload_weight = None
+normalize_field = None
+normalize_all = None
+ITEM_LIST_LENGTH_FIELD = item_length
+LIST_SUFFIX = _list
+MAX_ITEM_LIST_LENGTH = 50
+POSITION_FIELD = position_id
+HEAD_ENTITY_ID_FIELD = head_id
+TAIL_ENTITY_ID_FIELD = tail_id
+RELATION_ID_FIELD = relation_id
+ENTITY_ID_FIELD = entity_id
+benchmark_filename = None
+
+Other Hyper Parameters: 
+worker = 0
+wandb_project = recbole
+shuffle = True
+require_pow = False
+enable_amp = False
+enable_scaler = False
+transform = None
+embedding_size = 64
+n_layers = 2
+reg_weight = 1e-05
+numerical_features = []
+discretization = None
+kg_reverse_r = False
+entity_kg_num_interval = [0,inf)
+relation_kg_num_interval = [0,inf)
+MODEL_TYPE = ModelType.GENERAL
+neg_sampling = {'uniform': 1}
+save_model = True
+resume = False
+save_result = True
+result_format = parquet
+result_dir = /scratch/jd5316/Capstone/Capstone/results/lightgcn_base/
+MODEL_INPUT_TYPE = InputType.PAIRWISE
+eval_type = EvaluatorType.RANKING
+single_spec = True
+local_rank = 0
+device = cuda
+valid_neg_sample_args = {'distribution': 'uniform', 'sample_num': 'none'}
+test_neg_sample_args = {'distribution': 'uniform', 'sample_num': 'none'}
+
+
+Thu 27 Nov 2025 10:48:47 INFO  music_sample
+The number of users: 8001
+Average actions of users: 107.512
+The number of items: 24070
+Average actions of items: 35.73459636877311
+The number of inters: 860096
+The sparsity of the dataset: 99.5533919290417%
+Remain Fields: ['user_id', 'item_id']
+Thu 27 Nov 2025 10:48:49 INFO  [Training]: train_batch_size = [4096] train_neg_sample_args: [{'distribution': 'uniform', 'sample_num': 1, 'alpha': 1.0, 'dynamic': False, 'candidate_num': 0}]
+Thu 27 Nov 2025 10:48:49 INFO  [Evaluation]: eval_batch_size = [4096] eval_args: [{'split': {'RS': [0.8, 0.1, 0.1]}, 'order': 'RO', 'group_by': 'user', 'mode': {'valid': 'full', 'test': 'full'}}]
+Thu 27 Nov 2025 10:48:50 INFO  LightGCN(
+  (user_embedding): Embedding(8001, 64)
+  (item_embedding): Embedding(24070, 64)
+  (mf_loss): BPRLoss()
+  (reg_loss): EmbLoss()
+)
+Trainable parameters: 2052544
+Thu 27 Nov 2025 10:48:52 INFO  FLOPs: 0.0
+Thu 27 Nov 2025 10:49:06 INFO  epoch 0 training [time: 4.65s, train loss: 94.8754]
+Thu 27 Nov 2025 10:49:14 INFO  epoch 0 evaluating [time: 8.14s, valid_score: 0.061200]
+Thu 27 Nov 2025 10:49:14 INFO  valid result: 
+recall@10 : 0.0174    recall@20 : 0.0299    recall@50 : 0.0589    recall@100 : 0.1029    mrr@10 : 0.0612    mrr@20 : 0.0668    mrr@50 : 0.0716    mrr@100 : 0.0736    ndcg@10 : 0.0215    ndcg@20 : 0.0268    ndcg@50 : 0.0391    ndcg@100 : 0.0548    hit@10 : 0.1518    hit@20 : 0.2344    hit@50 : 0.3881    hit@100 : 0.5251    precision@10 : 0.0178    precision@20 : 0.0154    precision@50 : 0.0121    precision@100 : 0.0106
+Thu 27 Nov 2025 10:49:15 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:49:18 INFO  epoch 1 training [time: 3.36s, train loss: 55.6658]
+Thu 27 Nov 2025 10:49:26 INFO  epoch 1 evaluating [time: 8.04s, valid_score: 0.062300]
+Thu 27 Nov 2025 10:49:26 INFO  valid result: 
+recall@10 : 0.0183    recall@20 : 0.0305    recall@50 : 0.0602    recall@100 : 0.1043    mrr@10 : 0.0623    mrr@20 : 0.0677    mrr@50 : 0.0726    mrr@100 : 0.0746    ndcg@10 : 0.0222    ndcg@20 : 0.0272    ndcg@50 : 0.0399    ndcg@100 : 0.0556    hit@10 : 0.1579    hit@20 : 0.2389    hit@50 : 0.3944    hit@100 : 0.5319    precision@10 : 0.0187    precision@20 : 0.0157    precision@50 : 0.0124    precision@100 : 0.0107
+Thu 27 Nov 2025 10:49:26 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:49:29 INFO  epoch 2 training [time: 3.35s, train loss: 51.3412]
+Thu 27 Nov 2025 10:49:38 INFO  epoch 2 evaluating [time: 8.12s, valid_score: 0.063100]
+Thu 27 Nov 2025 10:49:38 INFO  valid result: 
+recall@10 : 0.0186    recall@20 : 0.0319    recall@50 : 0.0627    recall@100 : 0.1075    mrr@10 : 0.0631    mrr@20 : 0.0689    mrr@50 : 0.0738    mrr@100 : 0.0758    ndcg@10 : 0.0225    ndcg@20 : 0.0282    ndcg@50 : 0.0412    ndcg@100 : 0.0572    hit@10 : 0.1602    hit@20 : 0.2452    hit@50 : 0.4024    hit@100 : 0.5389    precision@10 : 0.0189    precision@20 : 0.0164    precision@50 : 0.0129    precision@100 : 0.011
+Thu 27 Nov 2025 10:49:38 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:49:41 INFO  epoch 3 training [time: 3.34s, train loss: 49.0490]
+Thu 27 Nov 2025 10:49:49 INFO  epoch 3 evaluating [time: 8.09s, valid_score: 0.065900]
+Thu 27 Nov 2025 10:49:49 INFO  valid result: 
+recall@10 : 0.0198    recall@20 : 0.0334    recall@50 : 0.068    recall@100 : 0.1114    mrr@10 : 0.0659    mrr@20 : 0.0716    mrr@50 : 0.0768    mrr@100 : 0.0787    ndcg@10 : 0.0238    ndcg@20 : 0.0295    ndcg@50 : 0.0441    ndcg@100 : 0.0596    hit@10 : 0.168    hit@20 : 0.2529    hit@50 : 0.4202    hit@100 : 0.5519    precision@10 : 0.0202    precision@20 : 0.0171    precision@50 : 0.0139    precision@100 : 0.0114
+Thu 27 Nov 2025 10:49:49 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:49:52 INFO  epoch 4 training [time: 3.33s, train loss: 47.1478]
+Thu 27 Nov 2025 10:50:01 INFO  epoch 4 evaluating [time: 8.13s, valid_score: 0.067600]
+Thu 27 Nov 2025 10:50:01 INFO  valid result: 
+recall@10 : 0.0211    recall@20 : 0.0352    recall@50 : 0.0724    recall@100 : 0.1162    mrr@10 : 0.0676    mrr@20 : 0.0736    mrr@50 : 0.0789    mrr@100 : 0.0808    ndcg@10 : 0.0249    ndcg@20 : 0.0309    ndcg@50 : 0.0467    ndcg@100 : 0.0623    hit@10 : 0.1755    hit@20 : 0.2629    hit@50 : 0.4308    hit@100 : 0.5651    precision@10 : 0.0216    precision@20 : 0.018    precision@50 : 0.0148    precision@100 : 0.0119
+Thu 27 Nov 2025 10:50:01 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:50:04 INFO  epoch 5 training [time: 3.33s, train loss: 45.1994]
+Thu 27 Nov 2025 10:50:12 INFO  epoch 5 evaluating [time: 8.10s, valid_score: 0.072800]
+Thu 27 Nov 2025 10:50:12 INFO  valid result: 
+recall@10 : 0.0225    recall@20 : 0.0378    recall@50 : 0.0779    recall@100 : 0.1208    mrr@10 : 0.0728    mrr@20 : 0.079    mrr@50 : 0.0843    mrr@100 : 0.0862    ndcg@10 : 0.0268    ndcg@20 : 0.0332    ndcg@50 : 0.0504    ndcg@100 : 0.0657    hit@10 : 0.1842    hit@20 : 0.2769    hit@50 : 0.4414    hit@100 : 0.5749    precision@10 : 0.0229    precision@20 : 0.0193    precision@50 : 0.0159    precision@100 : 0.0124
+Thu 27 Nov 2025 10:50:12 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:50:16 INFO  epoch 6 training [time: 3.33s, train loss: 43.6818]
+Thu 27 Nov 2025 10:50:24 INFO  epoch 6 evaluating [time: 8.16s, valid_score: 0.075600]
+Thu 27 Nov 2025 10:50:24 INFO  valid result: 
+recall@10 : 0.0236    recall@20 : 0.0406    recall@50 : 0.0814    recall@100 : 0.1276    mrr@10 : 0.0756    mrr@20 : 0.0823    mrr@50 : 0.0875    mrr@100 : 0.0895    ndcg@10 : 0.0281    ndcg@20 : 0.0353    ndcg@50 : 0.0529    ndcg@100 : 0.0693    hit@10 : 0.1919    hit@20 : 0.29    hit@50 : 0.4508    hit@100 : 0.5929    precision@10 : 0.0241    precision@20 : 0.0207    precision@50 : 0.0167    precision@100 : 0.0131
+Thu 27 Nov 2025 10:50:24 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:50:27 INFO  epoch 7 training [time: 3.34s, train loss: 42.5749]
+Thu 27 Nov 2025 10:50:35 INFO  epoch 7 evaluating [time: 8.14s, valid_score: 0.079500]
+Thu 27 Nov 2025 10:50:35 INFO  valid result: 
+recall@10 : 0.0259    recall@20 : 0.0441    recall@50 : 0.0855    recall@100 : 0.1328    mrr@10 : 0.0795    mrr@20 : 0.0863    mrr@50 : 0.0913    mrr@100 : 0.0933    ndcg@10 : 0.0303    ndcg@20 : 0.0381    ndcg@50 : 0.0559    ndcg@100 : 0.0727    hit@10 : 0.2028    hit@20 : 0.3035    hit@50 : 0.461    hit@100 : 0.6008    precision@10 : 0.0263    precision@20 : 0.0224    precision@50 : 0.0175    precision@100 : 0.0136
+Thu 27 Nov 2025 10:50:35 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:50:39 INFO  epoch 8 training [time: 3.35s, train loss: 41.3876]
+Thu 27 Nov 2025 10:50:47 INFO  epoch 8 evaluating [time: 8.15s, valid_score: 0.083700]
+Thu 27 Nov 2025 10:50:47 INFO  valid result: 
+recall@10 : 0.0275    recall@20 : 0.0467    recall@50 : 0.0896    recall@100 : 0.1386    mrr@10 : 0.0837    mrr@20 : 0.0906    mrr@50 : 0.0959    mrr@100 : 0.0978    ndcg@10 : 0.0322    ndcg@20 : 0.0405    ndcg@50 : 0.0589    ndcg@100 : 0.0763    hit@10 : 0.2088    hit@20 : 0.3101    hit@50 : 0.4735    hit@100 : 0.6112    precision@10 : 0.0278    precision@20 : 0.0237    precision@50 : 0.0183    precision@100 : 0.0142
+Thu 27 Nov 2025 10:50:47 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:50:50 INFO  epoch 9 training [time: 3.34s, train loss: 40.7752]
+Thu 27 Nov 2025 10:50:58 INFO  epoch 9 evaluating [time: 8.13s, valid_score: 0.090300]
+Thu 27 Nov 2025 10:50:58 INFO  valid result: 
+recall@10 : 0.0296    recall@20 : 0.0495    recall@50 : 0.0936    recall@100 : 0.1432    mrr@10 : 0.0903    mrr@20 : 0.097    mrr@50 : 0.1022    mrr@100 : 0.1042    ndcg@10 : 0.0349    ndcg@20 : 0.0434    ndcg@50 : 0.0624    ndcg@100 : 0.08    hit@10 : 0.2181    hit@20 : 0.3167    hit@50 : 0.477    hit@100 : 0.617    precision@10 : 0.0299    precision@20 : 0.0251    precision@50 : 0.0191    precision@100 : 0.0146
+Thu 27 Nov 2025 10:50:58 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:51:02 INFO  epoch 10 training [time: 3.38s, train loss: 39.6786]
+Thu 27 Nov 2025 10:51:10 INFO  epoch 10 evaluating [time: 8.13s, valid_score: 0.094800]
+Thu 27 Nov 2025 10:51:10 INFO  valid result: 
+recall@10 : 0.0308    recall@20 : 0.0522    recall@50 : 0.0973    recall@100 : 0.1475    mrr@10 : 0.0948    mrr@20 : 0.102    mrr@50 : 0.107    mrr@100 : 0.109    ndcg@10 : 0.037    ndcg@20 : 0.0462    ndcg@50 : 0.0656    ndcg@100 : 0.0834    hit@10 : 0.2218    hit@20 : 0.3278    hit@50 : 0.4844    hit@100 : 0.6225    precision@10 : 0.0312    precision@20 : 0.0264    precision@50 : 0.0199    precision@100 : 0.0151
+Thu 27 Nov 2025 10:51:10 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:51:13 INFO  epoch 11 training [time: 3.35s, train loss: 39.0287]
+Thu 27 Nov 2025 10:51:22 INFO  epoch 11 evaluating [time: 8.16s, valid_score: 0.100700]
+Thu 27 Nov 2025 10:51:22 INFO  valid result: 
+recall@10 : 0.0332    recall@20 : 0.0548    recall@50 : 0.1004    recall@100 : 0.1513    mrr@10 : 0.1007    mrr@20 : 0.1077    mrr@50 : 0.1127    mrr@100 : 0.1147    ndcg@10 : 0.0398    ndcg@20 : 0.049    ndcg@50 : 0.0686    ndcg@100 : 0.0866    hit@10 : 0.2304    hit@20 : 0.3329    hit@50 : 0.4915    hit@100 : 0.6296    precision@10 : 0.0334    precision@20 : 0.0277    precision@50 : 0.0205    precision@100 : 0.0155
+Thu 27 Nov 2025 10:51:22 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:51:25 INFO  epoch 12 training [time: 3.33s, train loss: 37.9947]
+Thu 27 Nov 2025 10:51:33 INFO  epoch 12 evaluating [time: 8.13s, valid_score: 0.103400]
+Thu 27 Nov 2025 10:51:33 INFO  valid result: 
+recall@10 : 0.0349    recall@20 : 0.0569    recall@50 : 0.1024    recall@100 : 0.1552    mrr@10 : 0.1034    mrr@20 : 0.1102    mrr@50 : 0.1153    mrr@100 : 0.1173    ndcg@10 : 0.0416    ndcg@20 : 0.0509    ndcg@50 : 0.0704    ndcg@100 : 0.0891    hit@10 : 0.2365    hit@20 : 0.3355    hit@50 : 0.4975    hit@100 : 0.6394    precision@10 : 0.0352    precision@20 : 0.0289    precision@50 : 0.0208    precision@100 : 0.0158
+Thu 27 Nov 2025 10:51:33 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:51:37 INFO  epoch 13 training [time: 3.34s, train loss: 37.4607]
+Thu 27 Nov 2025 10:51:45 INFO  epoch 13 evaluating [time: 8.14s, valid_score: 0.105400]
+Thu 27 Nov 2025 10:51:45 INFO  valid result: 
+recall@10 : 0.0357    recall@20 : 0.059    recall@50 : 0.105    recall@100 : 0.1586    mrr@10 : 0.1054    mrr@20 : 0.1123    mrr@50 : 0.1174    mrr@100 : 0.1194    ndcg@10 : 0.0426    ndcg@20 : 0.0525    ndcg@50 : 0.0722    ndcg@100 : 0.0913    hit@10 : 0.2406    hit@20 : 0.3414    hit@50 : 0.5018    hit@100 : 0.647    precision@10 : 0.036    precision@20 : 0.0299    precision@50 : 0.0213    precision@100 : 0.0162
+Thu 27 Nov 2025 10:51:45 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:51:48 INFO  epoch 14 training [time: 3.40s, train loss: 36.7315]
+Thu 27 Nov 2025 10:51:56 INFO  epoch 14 evaluating [time: 8.23s, valid_score: 0.107200]
+Thu 27 Nov 2025 10:51:56 INFO  valid result: 
+recall@10 : 0.0372    recall@20 : 0.06    recall@50 : 0.107    recall@100 : 0.1626    mrr@10 : 0.1072    mrr@20 : 0.114    mrr@50 : 0.1192    mrr@100 : 0.1213    ndcg@10 : 0.0439    ndcg@20 : 0.0536    ndcg@50 : 0.0738    ndcg@100 : 0.0935    hit@10 : 0.2451    hit@20 : 0.344    hit@50 : 0.5051    hit@100 : 0.6541    precision@10 : 0.0373    precision@20 : 0.0304    precision@50 : 0.0217    precision@100 : 0.0166
+Thu 27 Nov 2025 10:51:57 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:52:00 INFO  epoch 15 training [time: 3.35s, train loss: 35.9704]
+Thu 27 Nov 2025 10:52:08 INFO  epoch 15 evaluating [time: 8.17s, valid_score: 0.108100]
+Thu 27 Nov 2025 10:52:08 INFO  valid result: 
+recall@10 : 0.0376    recall@20 : 0.0613    recall@50 : 0.1088    recall@100 : 0.1654    mrr@10 : 0.1081    mrr@20 : 0.1151    mrr@50 : 0.1202    mrr@100 : 0.1223    ndcg@10 : 0.0445    ndcg@20 : 0.0546    ndcg@50 : 0.075    ndcg@100 : 0.095    hit@10 : 0.2481    hit@20 : 0.3498    hit@50 : 0.51    hit@100 : 0.6581    precision@10 : 0.0378    precision@20 : 0.0311    precision@50 : 0.0221    precision@100 : 0.0169
+Thu 27 Nov 2025 10:52:08 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:52:12 INFO  epoch 16 training [time: 3.34s, train loss: 35.3714]
+Thu 27 Nov 2025 10:52:20 INFO  epoch 16 evaluating [time: 8.12s, valid_score: 0.110900]
+Thu 27 Nov 2025 10:52:20 INFO  valid result: 
+recall@10 : 0.0385    recall@20 : 0.0626    recall@50 : 0.1111    recall@100 : 0.1688    mrr@10 : 0.1109    mrr@20 : 0.1178    mrr@50 : 0.1229    mrr@100 : 0.125    ndcg@10 : 0.0456    ndcg@20 : 0.0558    ndcg@50 : 0.0765    ndcg@100 : 0.097    hit@10 : 0.2522    hit@20 : 0.3539    hit@50 : 0.5155    hit@100 : 0.6635    precision@10 : 0.0388    precision@20 : 0.0317    precision@50 : 0.0225    precision@100 : 0.0172
+Thu 27 Nov 2025 10:52:20 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:52:23 INFO  epoch 17 training [time: 3.35s, train loss: 34.5366]
+Thu 27 Nov 2025 10:52:31 INFO  epoch 17 evaluating [time: 8.08s, valid_score: 0.111200]
+Thu 27 Nov 2025 10:52:31 INFO  valid result: 
+recall@10 : 0.0391    recall@20 : 0.0634    recall@50 : 0.1131    recall@100 : 0.1728    mrr@10 : 0.1112    mrr@20 : 0.1182    mrr@50 : 0.1234    mrr@100 : 0.1255    ndcg@10 : 0.046    ndcg@20 : 0.0564    ndcg@50 : 0.0776    ndcg@100 : 0.0988    hit@10 : 0.2559    hit@20 : 0.3581    hit@50 : 0.5228    hit@100 : 0.6732    precision@10 : 0.0394    precision@20 : 0.0321    precision@50 : 0.023    precision@100 : 0.0176
+Thu 27 Nov 2025 10:52:31 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:52:35 INFO  epoch 18 training [time: 3.34s, train loss: 34.0155]
+Thu 27 Nov 2025 10:52:43 INFO  epoch 18 evaluating [time: 8.09s, valid_score: 0.112100]
+Thu 27 Nov 2025 10:52:43 INFO  valid result: 
+recall@10 : 0.0398    recall@20 : 0.0649    recall@50 : 0.1152    recall@100 : 0.1756    mrr@10 : 0.1121    mrr@20 : 0.1192    mrr@50 : 0.1243    mrr@100 : 0.1265    ndcg@10 : 0.0467    ndcg@20 : 0.0573    ndcg@50 : 0.0789    ndcg@100 : 0.1003    hit@10 : 0.2609    hit@20 : 0.3639    hit@50 : 0.5284    hit@100 : 0.6788    precision@10 : 0.0401    precision@20 : 0.0329    precision@50 : 0.0234    precision@100 : 0.0179
+Thu 27 Nov 2025 10:52:43 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:52:46 INFO  epoch 19 training [time: 3.34s, train loss: 33.4721]
+Thu 27 Nov 2025 10:52:54 INFO  epoch 19 evaluating [time: 8.14s, valid_score: 0.113000]
+Thu 27 Nov 2025 10:52:54 INFO  valid result: 
+recall@10 : 0.0406    recall@20 : 0.0659    recall@50 : 0.1183    recall@100 : 0.1787    mrr@10 : 0.113    mrr@20 : 0.1202    mrr@50 : 0.1254    mrr@100 : 0.1275    ndcg@10 : 0.0474    ndcg@20 : 0.0582    ndcg@50 : 0.0806    ndcg@100 : 0.102    hit@10 : 0.2646    hit@20 : 0.3689    hit@50 : 0.5321    hit@100 : 0.6832    precision@10 : 0.0409    precision@20 : 0.0334    precision@50 : 0.024    precision@100 : 0.0182
+Thu 27 Nov 2025 10:52:54 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:52:58 INFO  epoch 20 training [time: 3.33s, train loss: 32.8481]
+Thu 27 Nov 2025 10:53:06 INFO  epoch 20 evaluating [time: 8.10s, valid_score: 0.115900]
+Thu 27 Nov 2025 10:53:06 INFO  valid result: 
+recall@10 : 0.0415    recall@20 : 0.0671    recall@50 : 0.121    recall@100 : 0.1823    mrr@10 : 0.1159    mrr@20 : 0.1229    mrr@50 : 0.1282    mrr@100 : 0.1303    ndcg@10 : 0.0487    ndcg@20 : 0.0596    ndcg@50 : 0.0826    ndcg@100 : 0.1043    hit@10 : 0.2705    hit@20 : 0.3721    hit@50 : 0.5417    hit@100 : 0.6896    precision@10 : 0.0417    precision@20 : 0.034    precision@50 : 0.0246    precision@100 : 0.0185
+Thu 27 Nov 2025 10:53:06 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:53:09 INFO  epoch 21 training [time: 3.36s, train loss: 32.2938]
+Thu 27 Nov 2025 10:53:17 INFO  epoch 21 evaluating [time: 8.09s, valid_score: 0.118300]
+Thu 27 Nov 2025 10:53:17 INFO  valid result: 
+recall@10 : 0.0422    recall@20 : 0.0684    recall@50 : 0.1235    recall@100 : 0.1861    mrr@10 : 0.1183    mrr@20 : 0.1253    mrr@50 : 0.1307    mrr@100 : 0.1328    ndcg@10 : 0.0496    ndcg@20 : 0.0607    ndcg@50 : 0.0843    ndcg@100 : 0.1065    hit@10 : 0.2755    hit@20 : 0.378    hit@50 : 0.5482    hit@100 : 0.6979    precision@10 : 0.0425    precision@20 : 0.0346    precision@50 : 0.025    precision@100 : 0.0189
+Thu 27 Nov 2025 10:53:17 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:53:21 INFO  epoch 22 training [time: 3.32s, train loss: 31.7765]
+Thu 27 Nov 2025 10:53:29 INFO  epoch 22 evaluating [time: 8.10s, valid_score: 0.120300]
+Thu 27 Nov 2025 10:53:29 INFO  valid result: 
+recall@10 : 0.0437    recall@20 : 0.0707    recall@50 : 0.1264    recall@100 : 0.1903    mrr@10 : 0.1203    mrr@20 : 0.1275    mrr@50 : 0.1328    mrr@100 : 0.135    ndcg@10 : 0.051    ndcg@20 : 0.0624    ndcg@50 : 0.0862    ndcg@100 : 0.1089    hit@10 : 0.2815    hit@20 : 0.3875    hit@50 : 0.556    hit@100 : 0.706    precision@10 : 0.044    precision@20 : 0.0357    precision@50 : 0.0256    precision@100 : 0.0193
+Thu 27 Nov 2025 10:53:29 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:53:32 INFO  epoch 23 training [time: 3.37s, train loss: 31.2057]
+Thu 27 Nov 2025 10:53:40 INFO  epoch 23 evaluating [time: 8.12s, valid_score: 0.122500]
+Thu 27 Nov 2025 10:53:40 INFO  valid result: 
+recall@10 : 0.0444    recall@20 : 0.0721    recall@50 : 0.1293    recall@100 : 0.1932    mrr@10 : 0.1225    mrr@20 : 0.1298    mrr@50 : 0.1352    mrr@100 : 0.1373    ndcg@10 : 0.052    ndcg@20 : 0.0638    ndcg@50 : 0.0882    ndcg@100 : 0.1109    hit@10 : 0.2861    hit@20 : 0.3912    hit@50 : 0.5638    hit@100 : 0.7101    precision@10 : 0.0447    precision@20 : 0.0364    precision@50 : 0.0262    precision@100 : 0.0196
+Thu 27 Nov 2025 10:53:41 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:53:44 INFO  epoch 24 training [time: 3.33s, train loss: 30.5593]
+Thu 27 Nov 2025 10:53:52 INFO  epoch 24 evaluating [time: 8.16s, valid_score: 0.125300]
+Thu 27 Nov 2025 10:53:52 INFO  valid result: 
+recall@10 : 0.0453    recall@20 : 0.0736    recall@50 : 0.1318    recall@100 : 0.197    mrr@10 : 0.1253    mrr@20 : 0.1328    mrr@50 : 0.1383    mrr@100 : 0.1403    ndcg@10 : 0.0532    ndcg@20 : 0.0652    ndcg@50 : 0.0901    ndcg@100 : 0.1132    hit@10 : 0.29    hit@20 : 0.3979    hit@50 : 0.5735    hit@100 : 0.7179    precision@10 : 0.0456    precision@20 : 0.0372    precision@50 : 0.0267    precision@100 : 0.02
+Thu 27 Nov 2025 10:53:52 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:53:55 INFO  epoch 25 training [time: 3.32s, train loss: 29.9747]
+Thu 27 Nov 2025 10:54:04 INFO  epoch 25 evaluating [time: 8.12s, valid_score: 0.129500]
+Thu 27 Nov 2025 10:54:04 INFO  valid result: 
+recall@10 : 0.0464    recall@20 : 0.0746    recall@50 : 0.1344    recall@100 : 0.2008    mrr@10 : 0.1295    mrr@20 : 0.1367    mrr@50 : 0.1424    mrr@100 : 0.1445    ndcg@10 : 0.0547    ndcg@20 : 0.0665    ndcg@50 : 0.0921    ndcg@100 : 0.1156    hit@10 : 0.2969    hit@20 : 0.4014    hit@50 : 0.5815    hit@100 : 0.7279    precision@10 : 0.0467    precision@20 : 0.0377    precision@50 : 0.0272    precision@100 : 0.0204
+Thu 27 Nov 2025 10:54:04 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:54:07 INFO  epoch 26 training [time: 3.33s, train loss: 29.4676]
+Thu 27 Nov 2025 10:54:15 INFO  epoch 26 evaluating [time: 8.18s, valid_score: 0.131800]
+Thu 27 Nov 2025 10:54:15 INFO  valid result: 
+recall@10 : 0.0472    recall@20 : 0.076    recall@50 : 0.1365    recall@100 : 0.2036    mrr@10 : 0.1318    mrr@20 : 0.1392    mrr@50 : 0.1449    mrr@100 : 0.147    ndcg@10 : 0.0558    ndcg@20 : 0.0678    ndcg@50 : 0.0937    ndcg@100 : 0.1175    hit@10 : 0.2992    hit@20 : 0.4084    hit@50 : 0.5894    hit@100 : 0.7345    precision@10 : 0.0475    precision@20 : 0.0384    precision@50 : 0.0276    precision@100 : 0.0207
+Thu 27 Nov 2025 10:54:15 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:54:19 INFO  epoch 27 training [time: 3.36s, train loss: 28.7304]
+Thu 27 Nov 2025 10:54:27 INFO  epoch 27 evaluating [time: 8.13s, valid_score: 0.132900]
+Thu 27 Nov 2025 10:54:27 INFO  valid result: 
+recall@10 : 0.0474    recall@20 : 0.0772    recall@50 : 0.1384    recall@100 : 0.2065    mrr@10 : 0.1329    mrr@20 : 0.1408    mrr@50 : 0.1464    mrr@100 : 0.1485    ndcg@10 : 0.0561    ndcg@20 : 0.0687    ndcg@50 : 0.0948    ndcg@100 : 0.1189    hit@10 : 0.3008    hit@20 : 0.4146    hit@50 : 0.5938    hit@100 : 0.7406    precision@10 : 0.0478    precision@20 : 0.039    precision@50 : 0.028    precision@100 : 0.021
+Thu 27 Nov 2025 10:54:27 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:54:30 INFO  epoch 28 training [time: 3.35s, train loss: 28.2864]
+Thu 27 Nov 2025 10:54:38 INFO  epoch 28 evaluating [time: 8.15s, valid_score: 0.135500]
+Thu 27 Nov 2025 10:54:38 INFO  valid result: 
+recall@10 : 0.0481    recall@20 : 0.0783    recall@50 : 0.1403    recall@100 : 0.2097    mrr@10 : 0.1355    mrr@20 : 0.1431    mrr@50 : 0.1489    mrr@100 : 0.151    ndcg@10 : 0.0571    ndcg@20 : 0.0697    ndcg@50 : 0.0963    ndcg@100 : 0.1209    hit@10 : 0.3059    hit@20 : 0.4174    hit@50 : 0.5995    hit@100 : 0.7456    precision@10 : 0.0485    precision@20 : 0.0394    precision@50 : 0.0284    precision@100 : 0.0213
+Thu 27 Nov 2025 10:54:38 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:54:42 INFO  epoch 29 training [time: 3.32s, train loss: 27.8579]
+Thu 27 Nov 2025 10:54:50 INFO  epoch 29 evaluating [time: 8.16s, valid_score: 0.138600]
+Thu 27 Nov 2025 10:54:50 INFO  valid result: 
+recall@10 : 0.0492    recall@20 : 0.0791    recall@50 : 0.1423    recall@100 : 0.2126    mrr@10 : 0.1386    mrr@20 : 0.1463    mrr@50 : 0.1521    mrr@100 : 0.1543    ndcg@10 : 0.0583    ndcg@20 : 0.0708    ndcg@50 : 0.0978    ndcg@100 : 0.1227    hit@10 : 0.3113    hit@20 : 0.4222    hit@50 : 0.6059    hit@100 : 0.7551    precision@10 : 0.0495    precision@20 : 0.0399    precision@50 : 0.0288    precision@100 : 0.0216
+Thu 27 Nov 2025 10:54:50 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:54:53 INFO  epoch 30 training [time: 3.35s, train loss: 27.1619]
+Thu 27 Nov 2025 10:55:01 INFO  epoch 30 evaluating [time: 8.13s, valid_score: 0.140000]
+Thu 27 Nov 2025 10:55:01 INFO  valid result: 
+recall@10 : 0.0497    recall@20 : 0.0806    recall@50 : 0.1432    recall@100 : 0.2145    mrr@10 : 0.14    mrr@20 : 0.1479    mrr@50 : 0.1536    mrr@100 : 0.1558    ndcg@10 : 0.0589    ndcg@20 : 0.0719    ndcg@50 : 0.0987    ndcg@100 : 0.124    hit@10 : 0.314    hit@20 : 0.4292    hit@50 : 0.6101    hit@100 : 0.7596    precision@10 : 0.05    precision@20 : 0.0406    precision@50 : 0.0289    precision@100 : 0.0218
+Thu 27 Nov 2025 10:55:01 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:55:05 INFO  epoch 31 training [time: 3.39s, train loss: 26.8564]
+Thu 27 Nov 2025 10:55:13 INFO  epoch 31 evaluating [time: 8.18s, valid_score: 0.140200]
+Thu 27 Nov 2025 10:55:13 INFO  valid result: 
+recall@10 : 0.0503    recall@20 : 0.0813    recall@50 : 0.1445    recall@100 : 0.2169    mrr@10 : 0.1402    mrr@20 : 0.1483    mrr@50 : 0.154    mrr@100 : 0.1562    ndcg@10 : 0.0594    ndcg@20 : 0.0724    ndcg@50 : 0.0994    ndcg@100 : 0.1251    hit@10 : 0.316    hit@20 : 0.4329    hit@50 : 0.6138    hit@100 : 0.7622    precision@10 : 0.0506    precision@20 : 0.041    precision@50 : 0.0292    precision@100 : 0.022
+Thu 27 Nov 2025 10:55:13 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:55:16 INFO  epoch 32 training [time: 3.33s, train loss: 26.4565]
+Thu 27 Nov 2025 10:55:25 INFO  epoch 32 evaluating [time: 8.18s, valid_score: 0.142200]
+Thu 27 Nov 2025 10:55:25 INFO  valid result: 
+recall@10 : 0.0506    recall@20 : 0.0816    recall@50 : 0.1456    recall@100 : 0.2188    mrr@10 : 0.1422    mrr@20 : 0.1502    mrr@50 : 0.156    mrr@100 : 0.1582    ndcg@10 : 0.06    ndcg@20 : 0.073    ndcg@50 : 0.1003    ndcg@100 : 0.1262    hit@10 : 0.3186    hit@20 : 0.4354    hit@50 : 0.6185    hit@100 : 0.7688    precision@10 : 0.0509    precision@20 : 0.0412    precision@50 : 0.0294    precision@100 : 0.0222
+Thu 27 Nov 2025 10:55:25 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:55:28 INFO  epoch 33 training [time: 3.36s, train loss: 26.1102]
+Thu 27 Nov 2025 10:55:36 INFO  epoch 33 evaluating [time: 8.12s, valid_score: 0.143800]
+Thu 27 Nov 2025 10:55:36 INFO  valid result: 
+recall@10 : 0.0508    recall@20 : 0.0819    recall@50 : 0.1465    recall@100 : 0.22    mrr@10 : 0.1438    mrr@20 : 0.1518    mrr@50 : 0.1577    mrr@100 : 0.1599    ndcg@10 : 0.0605    ndcg@20 : 0.0735    ndcg@50 : 0.1011    ndcg@100 : 0.1272    hit@10 : 0.3211    hit@20 : 0.4375    hit@50 : 0.623    hit@100 : 0.772    precision@10 : 0.0511    precision@20 : 0.0413    precision@50 : 0.0296    precision@100 : 0.0223
+Thu 27 Nov 2025 10:55:36 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:55:40 INFO  epoch 34 training [time: 3.36s, train loss: 25.7048]
+Thu 27 Nov 2025 10:55:48 INFO  epoch 34 evaluating [time: 8.12s, valid_score: 0.142800]
+Thu 27 Nov 2025 10:55:48 INFO  valid result: 
+recall@10 : 0.0515    recall@20 : 0.0826    recall@50 : 0.1477    recall@100 : 0.2213    mrr@10 : 0.1428    mrr@20 : 0.1508    mrr@50 : 0.1567    mrr@100 : 0.1588    ndcg@10 : 0.0607    ndcg@20 : 0.0737    ndcg@50 : 0.1015    ndcg@100 : 0.1276    hit@10 : 0.3234    hit@20 : 0.4416    hit@50 : 0.6271    hit@100 : 0.7746    precision@10 : 0.0518    precision@20 : 0.0416    precision@50 : 0.0298    precision@100 : 0.0225
+Thu 27 Nov 2025 10:55:51 INFO  epoch 35 training [time: 3.34s, train loss: 25.3720]
+Thu 27 Nov 2025 10:55:59 INFO  epoch 35 evaluating [time: 8.13s, valid_score: 0.143800]
+Thu 27 Nov 2025 10:55:59 INFO  valid result: 
+recall@10 : 0.0516    recall@20 : 0.0832    recall@50 : 0.149    recall@100 : 0.2231    mrr@10 : 0.1438    mrr@20 : 0.152    mrr@50 : 0.1579    mrr@100 : 0.16    ndcg@10 : 0.061    ndcg@20 : 0.0742    ndcg@50 : 0.1023    ndcg@100 : 0.1286    hit@10 : 0.3251    hit@20 : 0.4456    hit@50 : 0.6314    hit@100 : 0.778    precision@10 : 0.052    precision@20 : 0.0419    precision@50 : 0.0301    precision@100 : 0.0226
+Thu 27 Nov 2025 10:55:59 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:56:03 INFO  epoch 36 training [time: 3.35s, train loss: 24.9538]
+Thu 27 Nov 2025 10:56:11 INFO  epoch 36 evaluating [time: 8.09s, valid_score: 0.145500]
+Thu 27 Nov 2025 10:56:11 INFO  valid result: 
+recall@10 : 0.052    recall@20 : 0.0843    recall@50 : 0.1494    recall@100 : 0.2247    mrr@10 : 0.1455    mrr@20 : 0.1538    mrr@50 : 0.1596    mrr@100 : 0.1617    ndcg@10 : 0.0615    ndcg@20 : 0.0751    ndcg@50 : 0.1029    ndcg@100 : 0.1296    hit@10 : 0.3281    hit@20 : 0.4514    hit@50 : 0.6331    hit@100 : 0.7817    precision@10 : 0.0523    precision@20 : 0.0425    precision@50 : 0.0302    precision@100 : 0.0228
+Thu 27 Nov 2025 10:56:11 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:56:14 INFO  epoch 37 training [time: 3.33s, train loss: 24.5435]
+Thu 27 Nov 2025 10:56:22 INFO  epoch 37 evaluating [time: 8.02s, valid_score: 0.145400]
+Thu 27 Nov 2025 10:56:22 INFO  valid result: 
+recall@10 : 0.0526    recall@20 : 0.0846    recall@50 : 0.1507    recall@100 : 0.226    mrr@10 : 0.1454    mrr@20 : 0.1536    mrr@50 : 0.1595    mrr@100 : 0.1616    ndcg@10 : 0.0619    ndcg@20 : 0.0753    ndcg@50 : 0.1036    ndcg@100 : 0.1302    hit@10 : 0.3315    hit@20 : 0.4522    hit@50 : 0.6374    hit@100 : 0.7839    precision@10 : 0.0528    precision@20 : 0.0425    precision@50 : 0.0305    precision@100 : 0.0229
+Thu 27 Nov 2025 10:56:26 INFO  epoch 38 training [time: 3.34s, train loss: 24.3641]
+Thu 27 Nov 2025 10:56:34 INFO  epoch 38 evaluating [time: 8.02s, valid_score: 0.146400]
+Thu 27 Nov 2025 10:56:34 INFO  valid result: 
+recall@10 : 0.0522    recall@20 : 0.0855    recall@50 : 0.1513    recall@100 : 0.227    mrr@10 : 0.1464    mrr@20 : 0.1552    mrr@50 : 0.1609    mrr@100 : 0.163    ndcg@10 : 0.0619    ndcg@20 : 0.076    ndcg@50 : 0.1041    ndcg@100 : 0.131    hit@10 : 0.3296    hit@20 : 0.4581    hit@50 : 0.641    hit@100 : 0.7836    precision@10 : 0.0525    precision@20 : 0.043    precision@50 : 0.0306    precision@100 : 0.023
+Thu 27 Nov 2025 10:56:34 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:56:37 INFO  epoch 39 training [time: 3.33s, train loss: 23.9868]
+Thu 27 Nov 2025 10:56:45 INFO  epoch 39 evaluating [time: 8.07s, valid_score: 0.148300]
+Thu 27 Nov 2025 10:56:45 INFO  valid result: 
+recall@10 : 0.053    recall@20 : 0.0859    recall@50 : 0.1523    recall@100 : 0.2286    mrr@10 : 0.1483    mrr@20 : 0.1569    mrr@50 : 0.1627    mrr@100 : 0.1647    ndcg@10 : 0.0627    ndcg@20 : 0.0766    ndcg@50 : 0.1049    ndcg@100 : 0.132    hit@10 : 0.3351    hit@20 : 0.4602    hit@50 : 0.6436    hit@100 : 0.7872    precision@10 : 0.0532    precision@20 : 0.0433    precision@50 : 0.0308    precision@100 : 0.0232
+Thu 27 Nov 2025 10:56:45 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:56:48 INFO  epoch 40 training [time: 3.33s, train loss: 23.6050]
+Thu 27 Nov 2025 10:56:56 INFO  epoch 40 evaluating [time: 8.02s, valid_score: 0.149800]
+Thu 27 Nov 2025 10:56:56 INFO  valid result: 
+recall@10 : 0.0532    recall@20 : 0.0866    recall@50 : 0.1528    recall@100 : 0.23    mrr@10 : 0.1498    mrr@20 : 0.1587    mrr@50 : 0.1644    mrr@100 : 0.1665    ndcg@10 : 0.0632    ndcg@20 : 0.0773    ndcg@50 : 0.1056    ndcg@100 : 0.133    hit@10 : 0.3345    hit@20 : 0.4642    hit@50 : 0.6454    hit@100 : 0.7896    precision@10 : 0.0534    precision@20 : 0.0436    precision@50 : 0.0309    precision@100 : 0.0233
+Thu 27 Nov 2025 10:56:57 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:57:00 INFO  epoch 41 training [time: 3.32s, train loss: 23.5217]
+Thu 27 Nov 2025 10:57:08 INFO  epoch 41 evaluating [time: 8.07s, valid_score: 0.151000]
+Thu 27 Nov 2025 10:57:08 INFO  valid result: 
+recall@10 : 0.0539    recall@20 : 0.087    recall@50 : 0.1537    recall@100 : 0.2314    mrr@10 : 0.151    mrr@20 : 0.1597    mrr@50 : 0.1655    mrr@100 : 0.1676    ndcg@10 : 0.0638    ndcg@20 : 0.0777    ndcg@50 : 0.1063    ndcg@100 : 0.1338    hit@10 : 0.3388    hit@20 : 0.4659    hit@50 : 0.6481    hit@100 : 0.7951    precision@10 : 0.0541    precision@20 : 0.0438    precision@50 : 0.0311    precision@100 : 0.0235
+Thu 27 Nov 2025 10:57:08 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:57:11 INFO  epoch 42 training [time: 3.32s, train loss: 23.0383]
+Thu 27 Nov 2025 10:57:19 INFO  epoch 42 evaluating [time: 8.07s, valid_score: 0.152100]
+Thu 27 Nov 2025 10:57:19 INFO  valid result: 
+recall@10 : 0.0542    recall@20 : 0.088    recall@50 : 0.155    recall@100 : 0.2329    mrr@10 : 0.1521    mrr@20 : 0.1609    mrr@50 : 0.1666    mrr@100 : 0.1687    ndcg@10 : 0.0642    ndcg@20 : 0.0784    ndcg@50 : 0.1071    ndcg@100 : 0.1347    hit@10 : 0.3414    hit@20 : 0.4709    hit@50 : 0.6514    hit@100 : 0.7965    precision@10 : 0.0544    precision@20 : 0.0443    precision@50 : 0.0313    precision@100 : 0.0236
+Thu 27 Nov 2025 10:57:19 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:57:23 INFO  epoch 43 training [time: 3.37s, train loss: 22.8063]
+Thu 27 Nov 2025 10:57:31 INFO  epoch 43 evaluating [time: 8.03s, valid_score: 0.153800]
+Thu 27 Nov 2025 10:57:31 INFO  valid result: 
+recall@10 : 0.0547    recall@20 : 0.0883    recall@50 : 0.1568    recall@100 : 0.2342    mrr@10 : 0.1538    mrr@20 : 0.1627    mrr@50 : 0.1686    mrr@100 : 0.1707    ndcg@10 : 0.0648    ndcg@20 : 0.079    ndcg@50 : 0.1082    ndcg@100 : 0.1356    hit@10 : 0.3429    hit@20 : 0.4704    hit@50 : 0.6569    hit@100 : 0.799    precision@10 : 0.0548    precision@20 : 0.0444    precision@50 : 0.0317    precision@100 : 0.0237
+Thu 27 Nov 2025 10:57:31 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:57:34 INFO  epoch 44 training [time: 3.35s, train loss: 22.5286]
+Thu 27 Nov 2025 10:57:42 INFO  epoch 44 evaluating [time: 8.09s, valid_score: 0.153800]
+Thu 27 Nov 2025 10:57:42 INFO  valid result: 
+recall@10 : 0.0553    recall@20 : 0.089    recall@50 : 0.1577    recall@100 : 0.2357    mrr@10 : 0.1538    mrr@20 : 0.1628    mrr@50 : 0.1687    mrr@100 : 0.1708    ndcg@10 : 0.0652    ndcg@20 : 0.0795    ndcg@50 : 0.1089    ndcg@100 : 0.1366    hit@10 : 0.3446    hit@20 : 0.4738    hit@50 : 0.6576    hit@100 : 0.8021    precision@10 : 0.0553    precision@20 : 0.0448    precision@50 : 0.0319    precision@100 : 0.0239
+Thu 27 Nov 2025 10:57:42 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:57:46 INFO  epoch 45 training [time: 3.31s, train loss: 22.1756]
+Thu 27 Nov 2025 10:57:54 INFO  epoch 45 evaluating [time: 8.05s, valid_score: 0.156900]
+Thu 27 Nov 2025 10:57:54 INFO  valid result: 
+recall@10 : 0.0558    recall@20 : 0.0898    recall@50 : 0.1589    recall@100 : 0.2375    mrr@10 : 0.1569    mrr@20 : 0.1656    mrr@50 : 0.1715    mrr@100 : 0.1736    ndcg@10 : 0.0661    ndcg@20 : 0.0805    ndcg@50 : 0.11    ndcg@100 : 0.1379    hit@10 : 0.3491    hit@20 : 0.4762    hit@50 : 0.6611    hit@100 : 0.8045    precision@10 : 0.0558    precision@20 : 0.0452    precision@50 : 0.0321    precision@100 : 0.0241
+Thu 27 Nov 2025 10:57:54 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:57:57 INFO  epoch 46 training [time: 3.31s, train loss: 22.1712]
+Thu 27 Nov 2025 10:58:05 INFO  epoch 46 evaluating [time: 8.06s, valid_score: 0.156900]
+Thu 27 Nov 2025 10:58:05 INFO  valid result: 
+recall@10 : 0.0559    recall@20 : 0.0903    recall@50 : 0.1603    recall@100 : 0.2393    mrr@10 : 0.1569    mrr@20 : 0.1659    mrr@50 : 0.1718    mrr@100 : 0.1738    ndcg@10 : 0.0662    ndcg@20 : 0.0808    ndcg@50 : 0.1107    ndcg@100 : 0.1387    hit@10 : 0.3506    hit@20 : 0.4804    hit@50 : 0.666    hit@100 : 0.8074    precision@10 : 0.056    precision@20 : 0.0455    precision@50 : 0.0324    precision@100 : 0.0242
+Thu 27 Nov 2025 10:58:05 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:58:09 INFO  epoch 47 training [time: 3.31s, train loss: 21.8028]
+Thu 27 Nov 2025 10:58:17 INFO  epoch 47 evaluating [time: 8.05s, valid_score: 0.158400]
+Thu 27 Nov 2025 10:58:17 INFO  valid result: 
+recall@10 : 0.0564    recall@20 : 0.0909    recall@50 : 0.1615    recall@100 : 0.2408    mrr@10 : 0.1584    mrr@20 : 0.1672    mrr@50 : 0.1732    mrr@100 : 0.1753    ndcg@10 : 0.0669    ndcg@20 : 0.0814    ndcg@50 : 0.1116    ndcg@100 : 0.1396    hit@10 : 0.3546    hit@20 : 0.4815    hit@50 : 0.6704    hit@100 : 0.8114    precision@10 : 0.0566    precision@20 : 0.0457    precision@50 : 0.0326    precision@100 : 0.0244
+Thu 27 Nov 2025 10:58:17 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:58:20 INFO  epoch 48 training [time: 3.35s, train loss: 21.4691]
+Thu 27 Nov 2025 10:58:28 INFO  epoch 48 evaluating [time: 8.04s, valid_score: 0.160500]
+Thu 27 Nov 2025 10:58:28 INFO  valid result: 
+recall@10 : 0.0569    recall@20 : 0.0917    recall@50 : 0.1626    recall@100 : 0.2426    mrr@10 : 0.1605    mrr@20 : 0.1692    mrr@50 : 0.1754    mrr@100 : 0.1774    ndcg@10 : 0.0675    ndcg@20 : 0.0822    ndcg@50 : 0.1126    ndcg@100 : 0.1409    hit@10 : 0.3582    hit@20 : 0.4828    hit@50 : 0.6734    hit@100 : 0.8136    precision@10 : 0.057    precision@20 : 0.0461    precision@50 : 0.0329    precision@100 : 0.0245
+Thu 27 Nov 2025 10:58:28 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:58:32 INFO  epoch 49 training [time: 3.31s, train loss: 21.1515]
+Thu 27 Nov 2025 10:58:40 INFO  epoch 49 evaluating [time: 8.06s, valid_score: 0.161600]
+Thu 27 Nov 2025 10:58:40 INFO  valid result: 
+recall@10 : 0.0577    recall@20 : 0.0924    recall@50 : 0.1634    recall@100 : 0.244    mrr@10 : 0.1616    mrr@20 : 0.1702    mrr@50 : 0.1764    mrr@100 : 0.1783    ndcg@10 : 0.0682    ndcg@20 : 0.0829    ndcg@50 : 0.1132    ndcg@100 : 0.1418    hit@10 : 0.3622    hit@20 : 0.487    hit@50 : 0.6768    hit@100 : 0.8146    precision@10 : 0.0577    precision@20 : 0.0464    precision@50 : 0.033    precision@100 : 0.0247
+Thu 27 Nov 2025 10:58:40 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:58:43 INFO  epoch 50 training [time: 3.37s, train loss: 20.8493]
+Thu 27 Nov 2025 10:58:51 INFO  epoch 50 evaluating [time: 8.06s, valid_score: 0.164000]
+Thu 27 Nov 2025 10:58:51 INFO  valid result: 
+recall@10 : 0.0584    recall@20 : 0.0935    recall@50 : 0.1651    recall@100 : 0.2457    mrr@10 : 0.164    mrr@20 : 0.1726    mrr@50 : 0.1787    mrr@100 : 0.1807    ndcg@10 : 0.0691    ndcg@20 : 0.0838    ndcg@50 : 0.1145    ndcg@100 : 0.143    hit@10 : 0.3664    hit@20 : 0.4919    hit@50 : 0.6795    hit@100 : 0.8182    precision@10 : 0.0583    precision@20 : 0.0469    precision@50 : 0.0333    precision@100 : 0.0248
+Thu 27 Nov 2025 10:58:51 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:58:55 INFO  epoch 51 training [time: 3.31s, train loss: 20.6868]
+Thu 27 Nov 2025 10:59:03 INFO  epoch 51 evaluating [time: 8.01s, valid_score: 0.164300]
+Thu 27 Nov 2025 10:59:03 INFO  valid result: 
+recall@10 : 0.0583    recall@20 : 0.0943    recall@50 : 0.1662    recall@100 : 0.2471    mrr@10 : 0.1643    mrr@20 : 0.1734    mrr@50 : 0.1794    mrr@100 : 0.1814    ndcg@10 : 0.0693    ndcg@20 : 0.0845    ndcg@50 : 0.1153    ndcg@100 : 0.144    hit@10 : 0.3634    hit@20 : 0.496    hit@50 : 0.6811    hit@100 : 0.8231    precision@10 : 0.0583    precision@20 : 0.0473    precision@50 : 0.0335    precision@100 : 0.025
+Thu 27 Nov 2025 10:59:03 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:59:06 INFO  epoch 52 training [time: 3.30s, train loss: 20.5138]
+Thu 27 Nov 2025 10:59:14 INFO  epoch 52 evaluating [time: 7.99s, valid_score: 0.167000]
+Thu 27 Nov 2025 10:59:14 INFO  valid result: 
+recall@10 : 0.0593    recall@20 : 0.0954    recall@50 : 0.1679    recall@100 : 0.2485    mrr@10 : 0.167    mrr@20 : 0.176    mrr@50 : 0.182    mrr@100 : 0.184    ndcg@10 : 0.0705    ndcg@20 : 0.0857    ndcg@50 : 0.1167    ndcg@100 : 0.1452    hit@10 : 0.3692    hit@20 : 0.5008    hit@50 : 0.6849    hit@100 : 0.823    precision@10 : 0.0593    precision@20 : 0.0479    precision@50 : 0.0339    precision@100 : 0.0251
+Thu 27 Nov 2025 10:59:14 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:59:17 INFO  epoch 53 training [time: 3.31s, train loss: 20.1171]
+Thu 27 Nov 2025 10:59:25 INFO  epoch 53 evaluating [time: 8.03s, valid_score: 0.169000]
+Thu 27 Nov 2025 10:59:25 INFO  valid result: 
+recall@10 : 0.0602    recall@20 : 0.0959    recall@50 : 0.169    recall@100 : 0.2502    mrr@10 : 0.169    mrr@20 : 0.1778    mrr@50 : 0.1838    mrr@100 : 0.1858    ndcg@10 : 0.0713    ndcg@20 : 0.0863    ndcg@50 : 0.1176    ndcg@100 : 0.1463    hit@10 : 0.374    hit@20 : 0.5019    hit@50 : 0.6862    hit@100 : 0.8256    precision@10 : 0.0602    precision@20 : 0.0481    precision@50 : 0.0341    precision@100 : 0.0253
+Thu 27 Nov 2025 10:59:26 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:59:29 INFO  epoch 54 training [time: 3.31s, train loss: 19.8375]
+Thu 27 Nov 2025 10:59:37 INFO  epoch 54 evaluating [time: 8.04s, valid_score: 0.169500]
+Thu 27 Nov 2025 10:59:37 INFO  valid result: 
+recall@10 : 0.0604    recall@20 : 0.0964    recall@50 : 0.1706    recall@100 : 0.2517    mrr@10 : 0.1695    mrr@20 : 0.1786    mrr@50 : 0.1848    mrr@100 : 0.1866    ndcg@10 : 0.0716    ndcg@20 : 0.0867    ndcg@50 : 0.1185    ndcg@100 : 0.1472    hit@10 : 0.373    hit@20 : 0.504    hit@50 : 0.6948    hit@100 : 0.8262    precision@10 : 0.0604    precision@20 : 0.0483    precision@50 : 0.0344    precision@100 : 0.0255
+Thu 27 Nov 2025 10:59:37 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:59:40 INFO  epoch 55 training [time: 3.33s, train loss: 19.7865]
+Thu 27 Nov 2025 10:59:48 INFO  epoch 55 evaluating [time: 8.05s, valid_score: 0.171400]
+Thu 27 Nov 2025 10:59:48 INFO  valid result: 
+recall@10 : 0.061    recall@20 : 0.0973    recall@50 : 0.1718    recall@100 : 0.2535    mrr@10 : 0.1714    mrr@20 : 0.1804    mrr@50 : 0.1865    mrr@100 : 0.1884    ndcg@10 : 0.0724    ndcg@20 : 0.0876    ndcg@50 : 0.1195    ndcg@100 : 0.1484    hit@10 : 0.3771    hit@20 : 0.508    hit@50 : 0.6972    hit@100 : 0.8306    precision@10 : 0.0609    precision@20 : 0.0489    precision@50 : 0.0346    precision@100 : 0.0257
+Thu 27 Nov 2025 10:59:48 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 10:59:52 INFO  epoch 56 training [time: 3.32s, train loss: 19.4356]
+Thu 27 Nov 2025 11:00:00 INFO  epoch 56 evaluating [time: 8.12s, valid_score: 0.173300]
+Thu 27 Nov 2025 11:00:00 INFO  valid result: 
+recall@10 : 0.0617    recall@20 : 0.0984    recall@50 : 0.1728    recall@100 : 0.2547    mrr@10 : 0.1733    mrr@20 : 0.1822    mrr@50 : 0.1882    mrr@100 : 0.1901    ndcg@10 : 0.0732    ndcg@20 : 0.0885    ndcg@50 : 0.1204    ndcg@100 : 0.1494    hit@10 : 0.3805    hit@20 : 0.5106    hit@50 : 0.6992    hit@100 : 0.8306    precision@10 : 0.0616    precision@20 : 0.0493    precision@50 : 0.0348    precision@100 : 0.0258
+Thu 27 Nov 2025 11:00:00 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 11:00:03 INFO  epoch 57 training [time: 3.32s, train loss: 19.0866]
+Thu 27 Nov 2025 11:00:11 INFO  epoch 57 evaluating [time: 8.14s, valid_score: 0.174200]
+Thu 27 Nov 2025 11:00:11 INFO  valid result: 
+recall@10 : 0.0621    recall@20 : 0.0987    recall@50 : 0.1735    recall@100 : 0.2566    mrr@10 : 0.1742    mrr@20 : 0.1833    mrr@50 : 0.1893    mrr@100 : 0.1913    ndcg@10 : 0.0736    ndcg@20 : 0.0889    ndcg@50 : 0.121    ndcg@100 : 0.1505    hit@10 : 0.3818    hit@20 : 0.5132    hit@50 : 0.6992    hit@100 : 0.8331    precision@10 : 0.062    precision@20 : 0.0495    precision@50 : 0.035    precision@100 : 0.026
+Thu 27 Nov 2025 11:00:12 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 11:00:15 INFO  epoch 58 training [time: 3.41s, train loss: 18.9530]
+Thu 27 Nov 2025 11:00:23 INFO  epoch 58 evaluating [time: 8.18s, valid_score: 0.176700]
+Thu 27 Nov 2025 11:00:23 INFO  valid result: 
+recall@10 : 0.0629    recall@20 : 0.1001    recall@50 : 0.1754    recall@100 : 0.2585    mrr@10 : 0.1767    mrr@20 : 0.1856    mrr@50 : 0.1917    mrr@100 : 0.1936    ndcg@10 : 0.0746    ndcg@20 : 0.0901    ndcg@50 : 0.1224    ndcg@100 : 0.1518    hit@10 : 0.3874    hit@20 : 0.5169    hit@50 : 0.7036    hit@100 : 0.8349    precision@10 : 0.0628    precision@20 : 0.0502    precision@50 : 0.0354    precision@100 : 0.0262
+Thu 27 Nov 2025 11:00:23 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 11:00:27 INFO  epoch 59 training [time: 3.33s, train loss: 18.7906]
+Thu 27 Nov 2025 11:00:35 INFO  epoch 59 evaluating [time: 8.13s, valid_score: 0.178300]
+Thu 27 Nov 2025 11:00:35 INFO  valid result: 
+recall@10 : 0.0635    recall@20 : 0.1008    recall@50 : 0.1767    recall@100 : 0.2602    mrr@10 : 0.1783    mrr@20 : 0.1874    mrr@50 : 0.1934    mrr@100 : 0.1953    ndcg@10 : 0.0754    ndcg@20 : 0.0909    ndcg@50 : 0.1234    ndcg@100 : 0.153    hit@10 : 0.389    hit@20 : 0.5205    hit@50 : 0.7071    hit@100 : 0.8375    precision@10 : 0.0634    precision@20 : 0.0505    precision@50 : 0.0356    precision@100 : 0.0263
+Thu 27 Nov 2025 11:00:35 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 11:00:38 INFO  epoch 60 training [time: 3.35s, train loss: 18.5335]
+Thu 27 Nov 2025 11:00:46 INFO  epoch 60 evaluating [time: 8.17s, valid_score: 0.179200]
+Thu 27 Nov 2025 11:00:46 INFO  valid result: 
+recall@10 : 0.0639    recall@20 : 0.1016    recall@50 : 0.1776    recall@100 : 0.2612    mrr@10 : 0.1792    mrr@20 : 0.1883    mrr@50 : 0.1943    mrr@100 : 0.1962    ndcg@10 : 0.0758    ndcg@20 : 0.0916    ndcg@50 : 0.1241    ndcg@100 : 0.1538    hit@10 : 0.3914    hit@20 : 0.5232    hit@50 : 0.7099    hit@100 : 0.8395    precision@10 : 0.0638    precision@20 : 0.0509    precision@50 : 0.0358    precision@100 : 0.0264
+Thu 27 Nov 2025 11:00:46 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 11:00:50 INFO  epoch 61 training [time: 3.35s, train loss: 18.1001]
+Thu 27 Nov 2025 11:00:58 INFO  epoch 61 evaluating [time: 8.18s, valid_score: 0.181000]
+Thu 27 Nov 2025 11:00:58 INFO  valid result: 
+recall@10 : 0.0646    recall@20 : 0.1024    recall@50 : 0.1785    recall@100 : 0.2632    mrr@10 : 0.181    mrr@20 : 0.1899    mrr@50 : 0.196    mrr@100 : 0.1979    ndcg@10 : 0.0766    ndcg@20 : 0.0922    ndcg@50 : 0.1249    ndcg@100 : 0.1549    hit@10 : 0.396    hit@20 : 0.5246    hit@50 : 0.7099    hit@100 : 0.8426    precision@10 : 0.0645    precision@20 : 0.0512    precision@50 : 0.036    precision@100 : 0.0266
+Thu 27 Nov 2025 11:00:58 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 11:01:01 INFO  epoch 62 training [time: 3.32s, train loss: 17.9473]
+Thu 27 Nov 2025 11:01:09 INFO  epoch 62 evaluating [time: 8.16s, valid_score: 0.181500]
+Thu 27 Nov 2025 11:01:09 INFO  valid result: 
+recall@10 : 0.0651    recall@20 : 0.1032    recall@50 : 0.1792    recall@100 : 0.2649    mrr@10 : 0.1815    mrr@20 : 0.1905    mrr@50 : 0.1966    mrr@100 : 0.1985    ndcg@10 : 0.077    ndcg@20 : 0.0929    ndcg@50 : 0.1255    ndcg@100 : 0.1559    hit@10 : 0.3964    hit@20 : 0.5251    hit@50 : 0.7129    hit@100 : 0.8456    precision@10 : 0.0649    precision@20 : 0.0516    precision@50 : 0.0361    precision@100 : 0.0268
+Thu 27 Nov 2025 11:01:10 INFO  Saving current: /scratch/jd5316/Capstone/Capstone/models/lightgcn_base/LightGCN-Nov-27-2025_10-48-52.pth
+Thu 27 Nov 2025 11:01:13 INFO  epoch 63 training [time: 3.40s, train loss: 17.5760]
