@@ -239,7 +239,7 @@ def audio_kl_divergence(user_hist_items, user_rec_items, item_df, feature_cols, 
     qr_profile = rec_norm.mean(axis=0)
 
     # Normalize these profile vectors to sum to 1 so they act as probabilities
-    # (Add small epsilon to avoid zero-division)
+    # Add small epsilon to avoid zero-division
     ph = ph_profile / (ph_profile.sum() + 1e-12)
     qr = qr_profile / (qr_profile.sum() + 1e-12)
 
